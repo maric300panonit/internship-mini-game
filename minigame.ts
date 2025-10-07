@@ -3,8 +3,17 @@ import * as createjs from "createjs-module"
 function init() {
     
     var stage = new createjs.Stage("miniGameCanvas");
-    //stage variables
+    //background variables
+    var background_bitmap = new createjs.Bitmap("background.png");
+    const background_speed = 1;
+    stage.addChild(background_bitmap);
     const ground_level = 500;
+
+    //road variables
+    var road_shape = new createjs.Shape();
+    road_shape.graphics.beginFill("gray").drawRect(0, 0, 1920, 200);
+    road_shape.y = ground_level + 400;
+    stage.addChild(road_shape);
 
     //images
     var character_standing_image = new Image();
@@ -61,12 +70,14 @@ function init() {
         }
         
         if (isLeftPressed) {
+            background_bitmap.x += background_speed;
             character_bitmap.x -= speed;
             if(character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_left_image;
             }
         }
         if (isRightPressed) {
+            background_bitmap.x -= background_speed;
             character_bitmap.x += speed;
             if(character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_right_image;
