@@ -9,16 +9,24 @@ function init() {
     var character_walking_right_image = new Image();
     loadCharacterImages();
     var character_bitmap = new createjs.Bitmap("character_standing.png");
+    var ground_level = 500;
+    character_bitmap.y = ground_level;
     var speed = 5;
     var isLeftPressed = false;
     var isRightPressed = false;
+    var isUpPressed = false;
+    var jumpheight = 100;
+    var jumpduration = 500;
     stage.addChild(character_bitmap);
-    //stage.update();
-    window.addEventListener("keydown", handleKeyDown);
-    window.addEventListener("keyup", handleKeyUp);
+    // const jumpUpTween = new createjs.Tween(character_bitmap)
+    //         .to({y: character_bitmap.y - jumpheight}, jumpduration / 2, createjs.Ease.quadOut)
+    //         .to({y: character_bitmap.y}, jumpduration / 2, createjs.Ease.quadIn);
+    // jumpUpTween.setPaused(true);
     createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
     createjs.Ticker.framerate = 60;
     createjs.Ticker.addEventListener("tick", handleTick);
+    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener("keyup", handleKeyUp);
     function loadCharacterImages() {
         character_standing_image.src = "character_standing.png";
         character_walking_right_image.src = "character_walking_right.png";
@@ -46,6 +54,11 @@ function init() {
             case 37:
                 isLeftPressed = true;
                 break;
+            case 38:
+                if (character_bitmap.y === ground_level) {
+                    character_jump();
+                }
+                break;
             case 39:
                 isRightPressed = true;
                 break;
@@ -57,10 +70,16 @@ function init() {
                 isLeftPressed = false;
                 character_bitmap.image = character_standing_image;
                 break;
+                break;
             case 39:
                 isRightPressed = false;
                 character_bitmap.image = character_standing_image;
                 break;
         }
+    }
+    function character_jump() {
+        createjs.Tween.get(character_bitmap)
+            .to({ y: character_bitmap.y - jumpheight }, jumpduration / 2, createjs.Ease.quadOut)
+            .to({ y: character_bitmap.y }, jumpduration / 2, createjs.Ease.quadIn);
     }
 }
