@@ -54,20 +54,21 @@ function init() {
         else {
             character_bitmap.image = character_standing_image;
         }
-        if (isLeftPressed) {
+        if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
             background_bitmap.x += background_speed;
             character_bitmap.x -= speed;
             if (character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_left_image;
             }
         }
-        if (isRightPressed) {
+        if (isRightPressed && canBitmapMoveRight(character_bitmap)) {
             background_bitmap.x -= background_speed;
             character_bitmap.x += speed;
             if (character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_right_image;
             }
         }
+        console.log(character_bitmap.x, character_bitmap.y);
         stage.update(event);
     }
     function handleKeyDown(event) {
@@ -103,5 +104,15 @@ function init() {
         createjs.Tween.get(character_bitmap)
             .to({ y: character_bitmap.y - jumpheight }, jumpduration / 2, createjs.Ease.quadOut)
             .to({ y: character_bitmap.y }, jumpduration / 2, createjs.Ease.quadIn);
+    }
+    function canBitmapMoveLeft(bitmap) {
+        if (bitmap.x >= 0) {
+            return true;
+        }
+    }
+    function canBitmapMoveRight(bitmap) {
+        if (bitmap.x <= 1920) {
+            return true;
+        }
     }
 }
