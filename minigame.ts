@@ -44,10 +44,11 @@ function init() {
     function handleTick(event: any) {
         if (isLeftPressed) {
             character_bitmap.x -= speed;
+            character_bitmap.image = character_walking_left_image;
         }
         if (isRightPressed) {
             character_bitmap.x += speed;
-            character_bitmap.image = character_walking_right_image
+            character_bitmap.image = character_walking_right_image;
         }
     stage.update(event);
     }
