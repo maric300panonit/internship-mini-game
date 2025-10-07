@@ -10,6 +10,7 @@ function init() {
     var character_standing_image = new Image();
     var character_walking_left_image = new Image();
     var character_walking_right_image = new Image();
+    var character_jumping_image = new Image();
     loadCharacterImages();
 
     //character variables
@@ -35,6 +36,7 @@ function init() {
         character_standing_image.src = "character_standing.png"
         character_walking_right_image.src = "character_walking_right.png"
         character_walking_left_image.src = "character_walking_left.png"
+        character_jumping_image.src = "character_jumping.png"
     
         character_standing_image.onload = function() {
 
@@ -45,17 +47,33 @@ function init() {
         character_walking_right_image.onload = function() {
 
         };
+        character_jumping_image.onload = function() {
+
+        };
     }
 
     function handleTick(event: any) {
+        if (character_bitmap.y != ground_level) {
+            character_bitmap.image = character_jumping_image;
+        }
+        else {
+            character_bitmap.image = character_standing_image;
+        }
+        
         if (isLeftPressed) {
             character_bitmap.x -= speed;
-            character_bitmap.image = character_walking_left_image;
+            if(character_bitmap.y == ground_level) {
+                character_bitmap.image = character_walking_left_image;
+            }
         }
         if (isRightPressed) {
             character_bitmap.x += speed;
-            character_bitmap.image = character_walking_right_image;
+            if(character_bitmap.y == ground_level) {
+                character_bitmap.image = character_walking_right_image;
+            }
         }
+        
+        
     stage.update(event);
     }
     
@@ -67,6 +85,7 @@ function init() {
             case 38:
                 if (character_bitmap.y === ground_level) {
                     character_jump();
+                    character_bitmap.image = character_jumping_image;
                 }
                 break;
             case 39:
