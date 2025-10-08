@@ -53,10 +53,10 @@ function init() {
     }
     function handleTick(event) {
         if (!isBitmapOnGround) {
-            character_bitmap.image = character_jumping_image;
+            changeAnimationToJumping(character_bitmap);
         }
         else {
-            character_bitmap.image = character_standing_image;
+            changeAnimationToStanding(character_bitmap);
         }
         if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
             handleMoveLeft();
@@ -134,7 +134,7 @@ function init() {
         character_bitmap.x -= speed;
         fence_bitmap.x += fence_speed;
         if (isBitmapOnGround(character_bitmap)) {
-            character_bitmap.image = character_walking_left_image;
+            changeAnimationToWalking(character_bitmap, "left");
         }
     }
     function handleMoveRight() {
@@ -142,7 +142,7 @@ function init() {
         fence_bitmap.x -= fence_speed;
         character_bitmap.x += speed;
         if (isBitmapOnGround(character_bitmap)) {
-            character_bitmap.image = character_walking_right_image;
+            changeAnimationToWalking(character_bitmap, "right");
         }
     }
 }
