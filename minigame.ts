@@ -15,6 +15,14 @@ function init() {
     road_shape.graphics.beginFill("gray").drawRect(0, 0, 1920, 200);
     road_shape.y = ground_level + 400;
     stage.addChild(road_shape);    
+
+    //fence
+    var fence_bitmap = new createjs.Bitmap("fence.png");
+    fence_bitmap.y = ground_level + 250;
+    stage.addChild(fence_bitmap);
+    const fence_speed = 2.5;
+    fence_bitmap.x = -75;
+
     //images
     var character_standing_image = new Image();
     var character_walking_left_image = new Image();
@@ -46,6 +54,7 @@ function init() {
         character_walking_right_image.src = "character_walking_right.png"
         character_walking_left_image.src = "character_walking_left.png"
         character_jumping_image.src = "character_jumping.png"
+        fence_image.src = "fence.png"
     
         character_standing_image.onload = function() {
 
@@ -57,6 +66,9 @@ function init() {
 
         };
         character_jumping_image.onload = function() {
+
+        };
+        fence_image.onload = function() {
 
         };
     }
@@ -72,12 +84,14 @@ function init() {
         if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
             background_bitmap.x += background_speed;
             character_bitmap.x -= speed;
+            fence_bitmap.x += fence_speed;
             if(character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_left_image;
             }
         }
         if (isRightPressed && canBitmapMoveRight(character_bitmap)) {
             background_bitmap.x -= background_speed;
+            fence_bitmap.x -= fence_speed;
             character_bitmap.x += speed;
             if(character_bitmap.y == ground_level) {
                 character_bitmap.image = character_walking_right_image;
