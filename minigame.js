@@ -5,7 +5,7 @@ function init() {
     var assetsPath = "assets/";
     var stage = new createjs.Stage("miniGameCanvas");
     //background variables
-    var background_bitmap = new createjs.Bitmap("assets/background.png");
+    var background_bitmap = new createjs.Bitmap(assetsPath + "background.png");
     var background_speed = 1;
     stage.addChild(background_bitmap);
     var ground_level = 350;
@@ -16,7 +16,7 @@ function init() {
     balcony_shape.y = ground_level + 400;
     stage.addChild(balcony_shape);
     //fence
-    var fence_bitmap = new createjs.Bitmap("assets/fence.png");
+    var fence_bitmap = new createjs.Bitmap(assetsPath + "fence.png");
     fence_bitmap.y = ground_level + 250;
     stage.addChild(fence_bitmap);
     var fence_speed = 2.5;
@@ -28,7 +28,7 @@ function init() {
     var character_jumping_image = new Image();
     loadCharacterImages();
     //character variables
-    var character_bitmap = new createjs.Bitmap("assets/character_standing.png");
+    var character_bitmap = new createjs.Bitmap(assetsPath + "character_standing.png");
     character_bitmap.y = ground_level;
     var speed = 5;
     var jumpheight = 100;
@@ -52,29 +52,18 @@ function init() {
         character_jumping_image.onload = function () { };
     }
     function handleTick(event) {
-        if (character_bitmap.y != ground_level) {
+        if (!isBitmapOnGround) {
             character_bitmap.image = character_jumping_image;
         }
         else {
             character_bitmap.image = character_standing_image;
         }
         if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
-            background_bitmap.x += background_speed;
-            character_bitmap.x -= speed;
-            fence_bitmap.x += fence_speed;
-            if (character_bitmap.y == ground_level) {
-                character_bitmap.image = character_walking_left_image;
-            }
+            handleMoveLeft();
         }
         if (isRightPressed && canBitmapMoveRight(character_bitmap)) {
-            background_bitmap.x -= background_speed;
-            fence_bitmap.x -= fence_speed;
-            character_bitmap.x += speed;
-            if (character_bitmap.y == ground_level) {
-                character_bitmap.image = character_walking_right_image;
-            }
+            handleMoveRight();
         }
-        console.log(character_bitmap.x, character_bitmap.y);
         stage.update(event);
     }
     function handleKeyDown(event) {
@@ -83,9 +72,9 @@ function init() {
                 isLeftPressed = true;
                 break;
             case 38:
-                if (character_bitmap.y === ground_level) {
+                if (isBitmapOnGround(character_bitmap)) {
                     character_jump();
-                    character_bitmap.image = character_jumping_image;
+                    changeAnimationToJumping(character_bitmap);
                 }
                 break;
             case 39:
@@ -97,12 +86,12 @@ function init() {
         switch (event.keyCode) {
             case 37:
                 isLeftPressed = false;
-                character_bitmap.image = character_standing_image;
+                changeAnimationToStanding(character_bitmap);
                 break;
                 break;
             case 39:
                 isRightPressed = false;
-                character_bitmap.image = character_standing_image;
+                changeAnimationToStanding(character_bitmap);
                 break;
         }
     }
@@ -119,6 +108,41 @@ function init() {
     function canBitmapMoveRight(bitmap) {
         if (bitmap.x <= 1920) {
             return true;
+        }
+    }
+    function changeAnimationToStanding(bitmap) {
+        bitmap.image = character_standing_image;
+    }
+    function changeAnimationToWalking(bitmap, direction) {
+        if (direction === "left") {
+            bitmap.image = character_walking_left_image;
+        }
+        else if (direction === "right") {
+            bitmap.image = character_walking_right_image;
+        }
+    }
+    function changeAnimationToJumping(bitmap) {
+        bitmap.image = character_jumping_image;
+    }
+    function isBitmapOnGround(bitmap) {
+        if (bitmap.y === ground_level) {
+            return true;
+        }
+    }
+    function handleMoveLeft() {
+        background_bitmap.x += background_speed;
+        character_bitmap.x -= speed;
+        fence_bitmap.x += fence_speed;
+        if (isBitmapOnGround(character_bitmap)) {
+            character_bitmap.image = character_walking_left_image;
+        }
+    }
+    function handleMoveRight() {
+        background_bitmap.x -= background_speed;
+        fence_bitmap.x -= fence_speed;
+        character_bitmap.x += speed;
+        if (isBitmapOnGround(character_bitmap)) {
+            character_bitmap.image = character_walking_right_image;
         }
     }
 }

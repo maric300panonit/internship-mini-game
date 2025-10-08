@@ -63,34 +63,24 @@ function init() {
     }
 
     function handleTick(event: any) {
-        if (character_bitmap.y != ground_level) {
-            character_bitmap.image = character_jumping_image;
+        if (!isBitmapOnGround) {
+            changeAnimationToJumping(character_bitmap);
         }
         else {
-            character_bitmap.image = character_standing_image;
+            changeAnimationToStanding(character_bitmap);
         }
         
         if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
-            background_bitmap.x += background_speed;
-            character_bitmap.x -= speed;
-            fence_bitmap.x += fence_speed;
-            if(character_bitmap.y == ground_level) {
-                character_bitmap.image = character_walking_left_image;
-            }
+            handleMoveLeft();
         }
         if (isRightPressed && canBitmapMoveRight(character_bitmap)) {
-            background_bitmap.x -= background_speed;
-            fence_bitmap.x -= fence_speed;
-            character_bitmap.x += speed;
-            if(character_bitmap.y == ground_level) {
-                character_bitmap.image = character_walking_right_image;
-            }
+            handleMoveRight();
         }
-                console.log(character_bitmap.x, character_bitmap.y);
-
         
     stage.update(event);
     }
+
+    
     
     function handleKeyDown(event: any) {
         switch (event.keyCode) {
@@ -98,9 +88,9 @@ function init() {
                 isLeftPressed = true;
                 break;
             case 38:
-                if (character_bitmap.y === ground_level) {
+                if  (isBitmapOnGround(character_bitmap)) {
                     character_jump();
-                    character_bitmap.image = character_jumping_image;
+                    changeAnimationToJumping(character_bitmap);
                 }
                 break;
             case 39:
@@ -113,13 +103,13 @@ function init() {
         switch (event.keyCode) {
             case 37:
                 isLeftPressed = false;
-                character_bitmap.image = character_standing_image;
+                changeAnimationToStanding(character_bitmap);
                 break;
 
                 break;
             case 39:
                 isRightPressed = false;                    
-                character_bitmap.image = character_standing_image;
+                changeAnimationToStanding(character_bitmap);
                 break;
         }
     }
@@ -140,4 +130,43 @@ function init() {
             return true;
         }
     }
+
+    function changeAnimationToStanding(bitmap: createjs.Bitmap) {
+        bitmap.image = character_standing_image;
+    }
+
+    function changeAnimationToWalking(bitmap: createjs.Bitmap, direction: string) {
+        if (direction === "left") {
+            bitmap.image = character_walking_left_image;
+        }else if (direction === "right") {
+            bitmap.image = character_walking_right_image;
+        }
+    }
+    function changeAnimationToJumping(bitmap: createjs.Bitmap) {
+        bitmap.image = character_jumping_image;
+    }
+
+    function isBitmapOnGround(bitmap: createjs.Bitmap) {
+        if (bitmap.y === ground_level) {
+            return true;
+        }
+    }
+
+    function handleMoveLeft() {
+        background_bitmap.x += background_speed;
+            character_bitmap.x -= speed;
+            fence_bitmap.x += fence_speed;
+            if (isBitmapOnGround(character_bitmap)) {
+                character_bitmap.image = character_walking_left_image;
+            }
+    }
+
+    function handleMoveRight() {
+        background_bitmap.x -= background_speed;
+            fence_bitmap.x -= fence_speed;
+            character_bitmap.x += speed;
+            if (isBitmapOnGround(character_bitmap)) {
+                character_bitmap.image = character_walking_right_image;
+            }
+        }
 }
