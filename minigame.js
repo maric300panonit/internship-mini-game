@@ -7,7 +7,8 @@ function init() {
     var background_bitmap = new createjs.Bitmap("background.png");
     var background_speed = 1;
     stage.addChild(background_bitmap);
-    var ground_level = 500;
+    var ground_level = 350;
+    background_bitmap.y -= 300;
     //road variables
     var road_shape = new createjs.Shape();
     road_shape.graphics.beginFill("gray").drawRect(0, 0, 1920, 200);
