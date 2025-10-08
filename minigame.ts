@@ -63,11 +63,11 @@ function init() {
     }
 
     function handleTick(event: any) {
-        if (!isBitmapOnGround) {
-            changeAnimationToJumping(character_bitmap);
+        if (!isBitmapOnGround(character_bitmap)) {
+            changeCharacterAnimationToJumping();
         }
         else {
-            changeAnimationToStanding(character_bitmap);
+            changeCharacterAnimationToStanding();
         }
         
         if (isLeftPressed && canBitmapMoveLeft(character_bitmap)) {
@@ -90,7 +90,7 @@ function init() {
             case 38:
                 if  (isBitmapOnGround(character_bitmap)) {
                     character_jump();
-                    changeAnimationToJumping(character_bitmap);
+                    changeCharacterAnimationToJumping();
                 }
                 break;
             case 39:
@@ -103,13 +103,13 @@ function init() {
         switch (event.keyCode) {
             case 37:
                 isLeftPressed = false;
-                changeAnimationToStanding(character_bitmap);
+                changeCharacterAnimationToStanding();
                 break;
 
                 break;
             case 39:
                 isRightPressed = false;                    
-                changeAnimationToStanding(character_bitmap);
+                changeCharacterAnimationToStanding();
                 break;
         }
     }
@@ -131,19 +131,19 @@ function init() {
         }
     }
 
-    function changeAnimationToStanding(bitmap: createjs.Bitmap) {
-        bitmap.image = character_standing_image;
+    function changeCharacterAnimationToStanding() {
+        character_bitmap.image = character_standing_image;
     }
 
-    function changeAnimationToWalking(bitmap: createjs.Bitmap, direction: string) {
+    function changeCharacterAnimationToWalking(direction: string) {
         if (direction === "left") {
-            bitmap.image = character_walking_left_image;
+            character_bitmap.image = character_walking_left_image;
         }else if (direction === "right") {
-            bitmap.image = character_walking_right_image;
+            character_bitmap.image = character_walking_right_image;
         }
     }
-    function changeAnimationToJumping(bitmap: createjs.Bitmap) {
-        bitmap.image = character_jumping_image;
+    function changeCharacterAnimationToJumping() {
+        character_bitmap.image = character_jumping_image;
     }
 
     function isBitmapOnGround(bitmap: createjs.Bitmap) {
@@ -157,7 +157,7 @@ function init() {
             character_bitmap.x -= speed;
             fence_bitmap.x += fence_speed;
             if (isBitmapOnGround(character_bitmap)) {
-                changeAnimationToWalking(character_bitmap, "left");
+                changeCharacterAnimationToWalking("left");
             }
     }
 
@@ -166,7 +166,7 @@ function init() {
             fence_bitmap.x -= fence_speed;
             character_bitmap.x += speed;
             if (isBitmapOnGround(character_bitmap)) {
-                changeAnimationToWalking(character_bitmap, "right");
+                changeCharacterAnimationToWalking("right");
             }
         }
 }
