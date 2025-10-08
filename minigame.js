@@ -2,20 +2,21 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var createjs = require("createjs-module");
 function init() {
+    var assetsPath = "assets/";
     var stage = new createjs.Stage("miniGameCanvas");
     //background variables
-    var background_bitmap = new createjs.Bitmap("background.png");
+    var background_bitmap = new createjs.Bitmap("assets/background.png");
     var background_speed = 1;
     stage.addChild(background_bitmap);
     var ground_level = 350;
     background_bitmap.y -= 300;
-    //road variables
-    var road_shape = new createjs.Shape();
-    road_shape.graphics.beginFill("gray").drawRect(0, 0, 1920, 200);
-    road_shape.y = ground_level + 400;
-    stage.addChild(road_shape);
+    //balcony variables
+    var balcony_shape = new createjs.Shape();
+    balcony_shape.graphics.beginFill("gray").drawRect(0, 0, 1920, 200);
+    balcony_shape.y = ground_level + 400;
+    stage.addChild(balcony_shape);
     //fence
-    var fence_bitmap = new createjs.Bitmap("fence.png");
+    var fence_bitmap = new createjs.Bitmap("assets/fence.png");
     fence_bitmap.y = ground_level + 250;
     stage.addChild(fence_bitmap);
     var fence_speed = 2.5;
@@ -25,10 +26,9 @@ function init() {
     var character_walking_left_image = new Image();
     var character_walking_right_image = new Image();
     var character_jumping_image = new Image();
-    var fence_image = new Image();
     loadCharacterImages();
     //character variables
-    var character_bitmap = new createjs.Bitmap("character_standing.png");
+    var character_bitmap = new createjs.Bitmap("assets/character_standing.png");
     character_bitmap.y = ground_level;
     var speed = 5;
     var jumpheight = 100;
@@ -42,21 +42,14 @@ function init() {
     window.addEventListener("keydown", handleKeyDown);
     window.addEventListener("keyup", handleKeyUp);
     function loadCharacterImages() {
-        character_standing_image.src = "character_standing.png";
-        character_walking_right_image.src = "character_walking_right.png";
-        character_walking_left_image.src = "character_walking_left.png";
-        character_jumping_image.src = "character_jumping.png";
-        fence_image.src = "fence.png";
-        character_standing_image.onload = function () {
-        };
-        character_walking_left_image.onload = function () {
-        };
-        character_walking_right_image.onload = function () {
-        };
-        character_jumping_image.onload = function () {
-        };
-        fence_image.onload = function () {
-        };
+        character_standing_image.src = assetsPath + "character_standing.png";
+        character_walking_right_image.src = assetsPath + "character_walking_right.png";
+        character_walking_left_image.src = assetsPath + "character_walking_left.png";
+        character_jumping_image.src = assetsPath + "character_jumping.png";
+        character_standing_image.onload = function () { };
+        character_walking_left_image.onload = function () { };
+        character_walking_right_image.onload = function () { };
+        character_jumping_image.onload = function () { };
     }
     function handleTick(event) {
         if (character_bitmap.y != ground_level) {
