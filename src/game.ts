@@ -256,8 +256,3 @@ changeCharacterAnimationToRunning(direction: string) {
             return false;        
     }
 }
-
-
-document.addEventListener("DOMContentLoaded", () => {
-    const game = new Game("gameCanvas");
-});

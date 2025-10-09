@@ -1,6 +1,5 @@
-import { Game } from "./Game";
+import { Game } from "./Game.ts";
 
 window.onload = () => {
-    console.log("test");
-    const game = new Game("miniGameCanvas");
+    const game = new Game("gameCanvas");
 }
