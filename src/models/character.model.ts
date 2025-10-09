@@ -71,7 +71,7 @@ export class Character {
         return false;
     }
 
-    Jump() {
+    jump() {
         createjs.Tween.get(this.bitmap)
             .to({ y: this.bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
             .to({ y: environment.ground_level }, this.jumpduration / 2, createjs.Ease.quadIn);

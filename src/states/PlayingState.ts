@@ -33,7 +33,7 @@ export class PlayingState implements IGameState {
                 break;
             case 38:
                 if (this.character.isOnGround(this.character.bitmap)) {
-                    this.character.Jump();
+                    this.character.jump();
                     this.character.changeAnimationToJumping();
                 }
                 break;
