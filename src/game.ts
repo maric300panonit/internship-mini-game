@@ -1,7 +1,94 @@
 import { IGameState } from "./states/IGameState";
-import { PlayingState } from "./states/PlayingState";
-import { PausedState } from "./states/PausedState";
-export class Game {
+import type { IGame } from "./IGame";
+export class PlayingState implements IGameState {
+    private game: IGame;
+
+    constructor(game: IGame) {
+        this.game = game;
+    }
+
+    enter() {
+        console.log("Game Started");
+    }
+    exit() {
+        console.log("Exiting Playing State");
+    }
+    update(event: any) {
+        if (!this.game.isBitmapOnGround(this.game.character_bitmap)) {
+            this.game.changeCharacterAnimationToJumping();
+        } else {
+            this.game.changeCharacterAnimationToStanding();
+        }
+        if (this.game.isLeftPressed && this.game.canBitmapMoveLeft(this.game.character_bitmap)) {
+            this.game.handleMoveLeft();
+        }
+        if (this.game.isRightPressed && this.game.canBitmapMoveRight(this.game.character_bitmap)) {
+            this.game.handleMoveRight();
+        }
+        this.game.stage.update(event);
+    }
+
+    handleKeyDown(event: KeyboardEvent) {
+        switch (event.keyCode) {
+            case 37:
+                this.game.isLeftPressed = true;
+                break;
+            case 38:
+                if (this.game.isBitmapOnGround(this.game.character_bitmap)) {
+                    this.game.characterJump();
+                    this.game.changeCharacterAnimationToJumping();
+                }
+                break;
+            case 39:
+                this.game.isRightPressed = true;
+                break;
+            case 80: // 'P' key to pause
+                this.game.transitionTo("paused");
+                break;
+        }
+    }
+    handleKeyUp(event: KeyboardEvent) {
+        switch (event.keyCode) {
+            case 37:
+                this.game.isLeftPressed = false;
+                this.game.changeCharacterAnimationToStanding();
+                break;
+            case 39:
+                this.game.isRightPressed = false;
+                this.game.changeCharacterAnimationToStanding();
+                break;
+        }
+    }
+}export class PausedState implements IGameState {
+    private game: IGame;
+
+    constructor(game: IGame) {
+        this.game = game;
+    }
+
+    enter() {
+        console.log("Game Paused");
+        this.game.stage.update();
+    }
+
+    exit() {
+        console.log("Resuming Game");
+    }
+
+    update(event: any) {
+        // No updates in paused state
+    }
+
+    handleKeyDown(event: KeyboardEvent) {
+        if (event.keyCode === 80) { // 'P' key to resume
+            this.game.transitionTo("playing");
+        }
+    }
+    handleKeyUp(event: KeyboardEvent) {
+        // No action on key up in paused state
+    }
+}
+export class Game{
     stage: createjs.Stage;
 
     assetsPath = "assets/";
@@ -36,8 +123,8 @@ export class Game {
     character_walking_right_image = new Image();
     character_jumping_image = new Image();
 
-    constructor() {
-        this.stage = new createjs.Stage("miniGameCanvas");
+    constructor(canvasId: string) {
+        this.stage = new createjs.Stage(canvasId);
         this.initialize();
     }
 
@@ -49,9 +136,9 @@ export class Game {
         this.setupTicker();
         this.setupEventListeners();
 
+        // Set initial state to PlayingState
         this.currentState = new PlayingState(this);
         this.currentState.enter();
-
     }
 
     private update(event: any) {
@@ -79,7 +166,7 @@ export class Game {
 
     setupBalcony() {
         this.balcony_shape = new createjs.Shape();
-        this.balcony_shape.graphics.beginFill("gray").drawRect(0, 0, this.balcony_shape_height, this.balcony_shape_width);
+        this.balcony_shape.graphics.beginFill("gray").drawRect(0, 0, this.balcony_shape_width, this.balcony_shape_height);
         this.balcony_shape.y = this.ground_level + 400;
         this.stage.addChild(this.balcony_shape);
     }
@@ -115,25 +202,26 @@ export class Game {
     setupTicker() {
         createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
         createjs.Ticker.framerate = 60;
-        createjs.Ticker.addEventListener("tick", this.handleTick.bind(this));
+        createjs.Ticker.addEventListener("tick", this.update.bind(this));
     }
     setupEventListeners() {
         window.addEventListener("keydown", this.handleKeyDown.bind(this));
         window.addEventListener("keyup", this.handleKeyUp.bind(this));
     }
     handleTick() {
-        this.stage.update();
     }
     canBitmapMoveLeft(bitmap: createjs.Bitmap) {
             if (bitmap.x >= 0) {
                 return true;
             }
+            return false;
         }
     
     canBitmapMoveRight(bitmap: createjs.Bitmap) {
         if (bitmap.x <= 1920) {
             return true;
         }
+        return false;
     }
 
     changeCharacterAnimationToStanding() {
@@ -155,6 +243,7 @@ export class Game {
         if (bitmap.y === this.ground_level) {
             return true;
         }
+        return false;
     }
 
     characterJump() {
@@ -181,4 +270,15 @@ export class Game {
         this.fence_bitmap.x -= this.fence_speed;
     }
 
+    transitionTo(stateName: string) {
+        if (stateName === "playing") {
+            this.changeState(new PlayingState(this));
+        } else if (stateName === "paused") {
+            this.changeState(new PausedState(this));
+        }
+    }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const game = new Game("gameCanvas");
+});

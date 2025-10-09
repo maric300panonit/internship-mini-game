@@ -1,10 +1,10 @@
 import { IGameState } from "./IGameState";
-import { Game } from "../game";
-import { PlayingState } from "./PlayingState";
-export class PausedState implements IGameState {
-    private game: Game;
+import type { IGame } from "../IGame";
 
-    constructor(game: Game) {
+export class PausedState implements IGameState {
+    private game: IGame;
+
+    constructor(game: IGame) {
         this.game = game;
     }
 
@@ -23,11 +23,10 @@ export class PausedState implements IGameState {
 
     handleKeyDown(event: KeyboardEvent) {
         if (event.keyCode === 80) { // 'P' key to resume
-            this.game.changeState(new PlayingState(this.game));
+            this.game.transitionTo("playing");
         }
     }
     handleKeyUp(event: KeyboardEvent) {
         // No action on key up in paused state
     }
-
 }

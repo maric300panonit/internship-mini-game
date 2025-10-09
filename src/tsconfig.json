@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "useDefineForClassFields": true,
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx", // Or "react-jsxdev" for development
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"] // Example path alias for 'src' directory
+    },
+    "types": ["vite/client"] // To shim client-side environment types
+  },
+  "include": ["src", "vite.config.ts"], // Include source files and Vite config
+  "references": [] // Reference for Node.js specific settings
+}

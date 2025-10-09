@@ -1,0 +1,248 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.PlayingState = exports.PausedState = exports.Game = void 0;
+var Game = /** @class */ (function () {
+    function Game(canvasId) {
+        this.assetsPath = "assets/";
+        //backgroud variables
+        this.background_bitmap = new createjs.Bitmap(this.assetsPath + "background.png");
+        this.background_speed = 1;
+        this.ground_level = 350;
+        //balcony variables
+        this.balcony_shape = new createjs.Shape();
+        this.balcony_y = this.ground_level + 400;
+        this.balcony_shape_height = 200;
+        this.balcony_shape_width = 1920;
+        //fence variables
+        this.fence_bitmap = new createjs.Bitmap(this.assetsPath + "fence.png");
+        this.fence_speed = 2.5;
+        this.fence_bitmap_x = -75;
+        //character variables
+        this.character_bitmap = new createjs.Bitmap(this.assetsPath + "character_standing.png");
+        this.speed = 5;
+        this.jumpheight = 100;
+        this.jumpduration = 500;
+        this.isLeftPressed = false;
+        this.isRightPressed = false;
+        this.character_standing_image = new Image();
+        this.character_walking_left_image = new Image();
+        this.character_walking_right_image = new Image();
+        this.character_jumping_image = new Image();
+        this.stage = new createjs.Stage(canvasId);
+        this.initialize();
+    }
+    Game.prototype.initialize = function () {
+        this.setupBackground();
+        this.setupBalcony();
+        this.setupFence();
+        this.setupCharacter();
+        this.setupTicker();
+        this.setupEventListeners();
+        // Set initial state to PlayingState
+        this.currentState = new PlayingState(this);
+        this.currentState.enter();
+    };
+    Game.prototype.update = function (event) {
+        this.currentState.update(event);
+    };
+    Game.prototype.changeState = function (newState) {
+        this.currentState.exit();
+        this.currentState = newState;
+        this.currentState.enter();
+    };
+    Game.prototype.handleKeyDown = function (event) {
+        this.currentState.handleKeyDown(event);
+    };
+    Game.prototype.handleKeyUp = function (event) {
+        this.currentState.handleKeyUp(event);
+    };
+    Game.prototype.setupBackground = function () {
+        this.stage.addChild(this.background_bitmap);
+        this.background_bitmap.y -= 300;
+    };
+    Game.prototype.setupBalcony = function () {
+        this.balcony_shape = new createjs.Shape();
+        this.balcony_shape.graphics.beginFill("gray").drawRect(0, 0, this.balcony_shape_height, this.balcony_shape_width);
+        this.balcony_shape.y = this.ground_level + 400;
+        this.stage.addChild(this.balcony_shape);
+    };
+    Game.prototype.setupFence = function () {
+        this.stage.addChild(this.fence_bitmap);
+        this.fence_bitmap.y = this.ground_level + 250;
+    };
+    Game.prototype.setupCharacter = function () {
+        this.character_standing_image = new Image();
+        this.character_walking_left_image = new Image();
+        this.character_walking_right_image = new Image();
+        this.character_jumping_image = new Image();
+        this.loadCharacterImages();
+        this.character_bitmap.y = this.ground_level;
+        this.stage.addChild(this.character_bitmap);
+    };
+    Game.prototype.loadCharacterImages = function () {
+        this.character_standing_image.src = this.assetsPath + "character_standing.png";
+        this.character_walking_right_image.src = this.assetsPath + "character_walking_right.png";
+        this.character_walking_left_image.src = this.assetsPath + "character_walking_left.png";
+        this.character_jumping_image.src = this.assetsPath + "character_jumping.png";
+        this.character_standing_image.onload = function () { };
+        this.character_walking_left_image.onload = function () { };
+        this.character_walking_right_image.onload = function () { };
+        this.character_jumping_image.onload = function () { };
+    };
+    Game.prototype.setupTicker = function () {
+        createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+        createjs.Ticker.framerate = 60;
+        createjs.Ticker.addEventListener("tick", this.handleTick.bind(this));
+    };
+    Game.prototype.setupEventListeners = function () {
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
+        window.addEventListener("keyup", this.handleKeyUp.bind(this));
+    };
+    Game.prototype.handleTick = function () {
+        this.stage.update();
+    };
+    Game.prototype.canBitmapMoveLeft = function (bitmap) {
+        if (bitmap.x >= 0) {
+            return true;
+        }
+        return false;
+    };
+    Game.prototype.canBitmapMoveRight = function (bitmap) {
+        if (bitmap.x <= 1920) {
+            return true;
+        }
+        return false;
+    };
+    Game.prototype.changeCharacterAnimationToStanding = function () {
+        this.character_bitmap.image = this.character_standing_image;
+    };
+    Game.prototype.changeCharacterAnimationToWalking = function (direction) {
+        if (direction === "left") {
+            this.character_bitmap.image = this.character_walking_left_image;
+        }
+        else if (direction === "right") {
+            this.character_bitmap.image = this.character_walking_right_image;
+        }
+    };
+    Game.prototype.changeCharacterAnimationToJumping = function () {
+        this.character_bitmap.image = this.character_jumping_image;
+    };
+    Game.prototype.isBitmapOnGround = function (bitmap) {
+        if (bitmap.y === this.ground_level) {
+            return true;
+        }
+        return false;
+    };
+    Game.prototype.characterJump = function () {
+        createjs.Tween.get(this.character_bitmap)
+            .to({ y: this.character_bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
+            .to({ y: this.ground_level }, this.jumpduration / 2, createjs.Ease.quadIn);
+    };
+    Game.prototype.handleMoveLeft = function () {
+        //TODO: checkif character is on ground before changing animation
+        this.character_bitmap.x -= this.speed;
+        this.changeCharacterAnimationToWalking("left");
+        this.background_bitmap.x += this.background_speed;
+        this.fence_bitmap.x += this.fence_speed;
+    };
+    Game.prototype.handleMoveRight = function () {
+        this.character_bitmap.x += this.speed;
+        this.changeCharacterAnimationToWalking("right");
+        this.background_bitmap.x -= this.background_speed;
+        this.fence_bitmap.x -= this.fence_speed;
+    };
+    Game.prototype.transitionTo = function (stateName) {
+        if (stateName === "playing") {
+            this.changeState(new PlayingState(this));
+        }
+        else if (stateName === "paused") {
+            this.changeState(new PausedState(this));
+        }
+    };
+    return Game;
+}());
+exports.Game = Game;
+var PausedState = /** @class */ (function () {
+    function PausedState(game) {
+        this.game = game;
+    }
+    PausedState.prototype.enter = function () {
+        console.log("Game Paused");
+        this.game.stage.update();
+    };
+    PausedState.prototype.exit = function () {
+        console.log("Resuming Game");
+    };
+    PausedState.prototype.update = function (event) {
+        // No updates in paused state
+    };
+    PausedState.prototype.handleKeyDown = function (event) {
+        if (event.keyCode === 80) { // 'P' key to resume
+            this.game.transitionTo("paused");
+        }
+    };
+    PausedState.prototype.handleKeyUp = function (event) {
+        // No action on key up in paused state
+    };
+    return PausedState;
+}());
+exports.PausedState = PausedState;
+var PlayingState = /** @class */ (function () {
+    function PlayingState(game) {
+        this.game = game;
+    }
+    PlayingState.prototype.enter = function () {
+        console.log("Game Started");
+    };
+    PlayingState.prototype.exit = function () {
+        console.log("Exiting Playing State");
+    };
+    PlayingState.prototype.update = function (event) {
+        if (!this.game.isBitmapOnGround(this.game.character_bitmap)) {
+            this.game.changeCharacterAnimationToJumping();
+        }
+        else {
+            this.game.changeCharacterAnimationToStanding();
+        }
+        if (this.game.isLeftPressed && this.game.canBitmapMoveLeft(this.game.character_bitmap)) {
+            this.game.handleMoveLeft();
+        }
+        if (this.game.isRightPressed && this.game.canBitmapMoveRight(this.game.character_bitmap)) {
+            this.game.handleMoveRight();
+        }
+        this.game.stage.update(event);
+    };
+    PlayingState.prototype.handleKeyDown = function (event) {
+        switch (event.keyCode) {
+            case 37:
+                this.game.isLeftPressed = true;
+                break;
+            case 38:
+                if (this.game.isBitmapOnGround(this.game.character_bitmap)) {
+                    this.game.characterJump();
+                    this.game.changeCharacterAnimationToJumping();
+                }
+                break;
+            case 39:
+                this.game.isRightPressed = true;
+                break;
+            case 80: // 'P' key to pause
+                this.game.transitionTo("paused");
+                break;
+        }
+    };
+    PlayingState.prototype.handleKeyUp = function (event) {
+        switch (event.keyCode) {
+            case 37:
+                this.game.isLeftPressed = false;
+                this.game.changeCharacterAnimationToStanding();
+                break;
+            case 39:
+                this.game.isRightPressed = false;
+                this.game.changeCharacterAnimationToStanding();
+                break;
+        }
+    };
+    return PlayingState;
+}());
+exports.PlayingState = PlayingState;

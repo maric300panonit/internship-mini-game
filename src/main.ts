@@ -1,6 +1,6 @@
-import { Game } from "./game";
+import { Game } from "./Game";
 
-function init() {
-    const game = new Game();
-    console.log("Game initialized:");
+window.onload = () => {
+    console.log("test");
+    const game = new Game("miniGameCanvas");
 }

@@ -1,11 +1,10 @@
 import { IGameState } from "./IGameState";
-import { Game } from "../game";
-import { PausedState } from "./PausedState";
+import type { IGame } from "../IGame";
 
 export class PlayingState implements IGameState {
-    private game: Game;
+    private game: IGame;
 
-    constructor(game: Game) {
+    constructor(game: IGame) {
         this.game = game;
     }
 
@@ -16,11 +15,9 @@ export class PlayingState implements IGameState {
         console.log("Exiting Playing State");
     }
     update(event: any) {
-
         if (!this.game.isBitmapOnGround(this.game.character_bitmap)) {
             this.game.changeCharacterAnimationToJumping();
-        }
-        else {
+        } else {
             this.game.changeCharacterAnimationToStanding();
         }
         if (this.game.isLeftPressed && this.game.canBitmapMoveLeft(this.game.character_bitmap)) {
@@ -30,7 +27,6 @@ export class PlayingState implements IGameState {
             this.game.handleMoveRight();
         }
         this.game.stage.update(event);
-            
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -39,16 +35,16 @@ export class PlayingState implements IGameState {
                 this.game.isLeftPressed = true;
                 break;
             case 38:
-                if  (this.game.isBitmapOnGround(this.game.character_bitmap)) {
+                if (this.game.isBitmapOnGround(this.game.character_bitmap)) {
                     this.game.characterJump();
                     this.game.changeCharacterAnimationToJumping();
                 }
                 break;
             case 39:
-                this.game.isRightPressed = true;                    
+                this.game.isRightPressed = true;
                 break;
             case 80: // 'P' key to pause
-                this.game.changeState(new PausedState(this.game));
+                this.game.transitionTo("paused");
                 break;
         }
     }
@@ -59,10 +55,9 @@ export class PlayingState implements IGameState {
                 this.game.changeCharacterAnimationToStanding();
                 break;
             case 39:
-                this.game.isRightPressed = false;                    
+                this.game.isRightPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
         }
     }
-
 }
