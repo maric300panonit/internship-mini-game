@@ -1,5 +1,5 @@
-import { IGameState } from "./IGameState";
-import type { IGame } from "../IGame";
+import { IGameState } from "./IGameState.ts";
+import type { IGame } from "../IGame.ts";
 
 export class PausedState implements IGameState {
     private game: IGame;
