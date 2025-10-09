@@ -6,25 +6,12 @@ var PlayingState = /** @class */ (function () {
         this.game = game;
     }
     PlayingState.prototype.enter = function () {
+        createjs.Ticker.paused = false;
+        this.game.pause_menu_container.visible = false;
         console.log("Game Started");
     };
     PlayingState.prototype.exit = function () {
         console.log("Exiting Playing State");
-    };
-    PlayingState.prototype.update = function (event) {
-        if (!this.game.isBitmapOnGround(this.game.character_bitmap)) {
-            this.game.changeCharacterAnimationToJumping();
-        }
-        else {
-            this.game.changeCharacterAnimationToStanding();
-        }
-        if (this.game.isLeftPressed && this.game.canBitmapMoveLeft(this.game.character_bitmap)) {
-            this.game.handleMoveLeft();
-        }
-        if (this.game.isRightPressed && this.game.canBitmapMoveRight(this.game.character_bitmap)) {
-            this.game.handleMoveRight();
-        }
-        this.game.stage.update(event);
     };
     PlayingState.prototype.handleKeyDown = function (event) {
         switch (event.keyCode) {
@@ -48,10 +35,12 @@ var PlayingState = /** @class */ (function () {
     PlayingState.prototype.handleKeyUp = function (event) {
         switch (event.keyCode) {
             case 37:
+                this.game.isDoubleClickActive = false;
                 this.game.isLeftPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
             case 39:
+                this.game.isDoubleClickActive = false;
                 this.game.isRightPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;

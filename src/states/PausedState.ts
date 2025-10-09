@@ -1,11 +1,14 @@
 import { IGameState } from "./IGameState.ts";
 import type { IGame } from "../IGame.ts";
+import { Character } from "../models/character.model.ts";
 
 export class PausedState implements IGameState {
     private game: IGame;
+    private character: Character;
 
-    constructor(game: IGame) {
+    constructor(game: IGame, character: Character) {
         this.game = game;
+        this.character = character;
     }
 
     enter() {
@@ -16,11 +19,12 @@ export class PausedState implements IGameState {
         this.game.stage.update();
     }
 
-    exit() {
-        console.log("Resuming Game");
+    update(event: any): void {
+        // No updates needed in paused state
     }
 
-    update(event: any) {
+    exit() {
+        console.log("Resuming Game");
     }
 
     handleKeyDown(event: KeyboardEvent) {

@@ -1,11 +1,15 @@
 import { IGameState } from "./IGameState.ts";
 import type { IGame } from "../IGame.ts";
+import { Character } from "../models/character.model.ts";
+import { environment } from "../env/env.ts";
 
 export class PlayingState implements IGameState {
     private game: IGame;
+    private character: Character;
 
-    constructor(game: IGame) {
+    constructor(game: IGame, character: Character) {
         this.game = game;
+        this.character = character;
     }
 
     enter() {
@@ -16,34 +20,25 @@ export class PlayingState implements IGameState {
     exit() {
         console.log("Exiting Playing State");
     }
-    update(event: any) {
-        if (!this.game.isBitmapOnGround(this.game.character_bitmap)) {
-            this.game.changeCharacterAnimationToJumping();
-        } else {
-            this.game.changeCharacterAnimationToStanding();
-        }
-        if (this.game.isLeftPressed && this.game.canBitmapMoveLeft(this.game.character_bitmap)) {
-            this.game.handleMoveLeft();
-        }
-        if (this.game.isRightPressed && this.game.canBitmapMoveRight(this.game.character_bitmap)) {
-            this.game.handleMoveRight();
-        }
-        this.game.stage.update(event);
+
+    update() {
+        this.character.update();
+        this.game.stage.update();
     }
 
     handleKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
             case 37:
-                this.game.isLeftPressed = true;
+                this.character.isLeftPressed = true;
                 break;
             case 38:
-                if (this.game.isBitmapOnGround(this.game.character_bitmap)) {
-                    this.game.characterJump();
-                    this.game.changeCharacterAnimationToJumping();
+                if (this.character.isOnGround(this.character.bitmap)) {
+                    this.character.Jump();
+                    this.character.changeAnimationToJumping();
                 }
                 break;
             case 39:
-                this.game.isRightPressed = true;
+                this.character.isRightPressed = true;
                 break;
             case 80: // 'P' key to pause
                 this.game.transitionTo("paused");
@@ -53,14 +48,14 @@ export class PlayingState implements IGameState {
     handleKeyUp(event: KeyboardEvent) {
         switch (event.keyCode) {
             case 37:
-                this.game.isDoubleClickActive = false;
-                this.game.isLeftPressed = false;
-                this.game.changeCharacterAnimationToStanding();
+                environment.isDoubleClickActive = false;
+                this.character.isLeftPressed = false;
+                this.character.changeAnimationToStanding();
                 break;
             case 39:
-                this.game.isDoubleClickActive = false;
-                this.game.isRightPressed = false;
-                this.game.changeCharacterAnimationToStanding();
+                environment.isDoubleClickActive = false;
+                this.character.isRightPressed = false;
+                this.character.changeAnimationToStanding();
                 break;
         }
     }
