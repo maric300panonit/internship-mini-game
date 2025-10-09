@@ -1,5 +1,6 @@
 import { IGameState } from "./states/IGameState";
 import type { IGame } from "./IGame";
+
 export class PlayingState implements IGameState {
     private game: IGame;
 
@@ -8,6 +9,8 @@ export class PlayingState implements IGameState {
     }
 
     enter() {
+        createjs.Ticker.paused = false;
+        this.game.pause_menu_container.visible = false;
         console.log("Game Started");
     }
     exit() {
@@ -61,7 +64,9 @@ export class PlayingState implements IGameState {
                 break;
         }
     }
-}export class PausedState implements IGameState {
+}
+
+export class PausedState implements IGameState {
     private game: IGame;
 
     constructor(game: IGame) {
@@ -70,6 +75,9 @@ export class PlayingState implements IGameState {
 
     enter() {
         console.log("Game Paused");
+        createjs.Ticker.paused = true;
+        this.game.pause_menu_container.visible = true;
+
         this.game.stage.update();
     }
 
@@ -78,7 +86,6 @@ export class PlayingState implements IGameState {
     }
 
     update(event: any) {
-        // No updates in paused state
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -90,11 +97,13 @@ export class PlayingState implements IGameState {
         // No action on key up in paused state
     }
 }
+
 export class Game{
     stage: createjs.Stage;
 
     assetsPath = "assets/";
     private currentState!: IGameState;
+
     lastClickTime = 0;
     doubleClickThreshold = 300; // milliseconds
     isDoubleClickActive = false;
@@ -123,6 +132,13 @@ export class Game{
     isLeftPressed = false;
     isRightPressed = false;
 
+    //pausemenu variables
+    pause_menu_container: createjs.Container = new createjs.Container();    
+    pause_menu_shape: createjs.Shape = new createjs.Shape();
+    pause_menu_text = new createjs.Text("Game Paused", "24px Arial", "#FFFFFF");
+    pause_menu_width = 400;
+    pause_menu_height = 200;
+
     character_standing_image = new Image();
     character_walking_left_image = new Image();
     character_walking_right_image = new Image();
@@ -140,6 +156,7 @@ export class Game{
         this.setupBalcony();
         this.setupFence();
         this.setupCharacter();
+        this.setupPauseMenu();
         this.setupTicker();
         this.setupEventListeners();
 
@@ -150,6 +167,18 @@ export class Game{
 
     private update(event: any) {
             this.currentState.update(event);
+    }
+
+    setupPauseMenu() {
+        this.pause_menu_shape.graphics.beginFill("rgba(0, 0, 0, 0.5)").drawRect(0, 0, this.pause_menu_width, this.pause_menu_height);
+        this.pause_menu_shape.x = (this.stage.canvas.width - this.pause_menu_width) / 2;
+        this.pause_menu_shape.y = (this.stage.canvas.height - this.pause_menu_height) / 2;
+        this.pause_menu_container.addChild(this.pause_menu_shape);
+        this.pause_menu_container.addChild(this.pause_menu_text);
+        this.pause_menu_text.x = this.pause_menu_shape.x + (this.pause_menu_width - this.pause_menu_text.getMeasuredWidth()) / 2;
+        this.pause_menu_text.y = this.pause_menu_shape.y + (this.pause_menu_height - this.pause_menu_text.getMeasuredHeight()) / 2;
+        this.stage.addChild(this.pause_menu_container);
+        this.pause_menu_container.visible = false;
     }
 
     changeState(newState: IGameState) {
@@ -184,10 +213,6 @@ export class Game{
     }
 
     setupCharacter() {
-        this.character_standing_image = new Image();
-        this.character_walking_left_image = new Image();
-        this.character_walking_right_image = new Image();
-        this.character_jumping_image = new Image();
         this.loadCharacterImages();
 
         this.character_bitmap.y = this.ground_level;
@@ -279,8 +304,8 @@ changeCharacterAnimationToRunning(direction: string) {
             this.changeCharacterAnimationToRunning("left");
         }
         else {
-        this.character_bitmap.x -= this.speed;
-        this.changeCharacterAnimationToWalking("left");
+            this.character_bitmap.x -= this.speed;
+            this.changeCharacterAnimationToWalking("left");
         }
 
         this.background_bitmap.x += this.background_speed;
@@ -295,8 +320,8 @@ changeCharacterAnimationToRunning(direction: string) {
             this.changeCharacterAnimationToRunning("right");
         }
         else {
-        this.character_bitmap.x += this.speed;
-        this.changeCharacterAnimationToWalking("right");
+            this.character_bitmap.x += this.speed;
+            this.changeCharacterAnimationToWalking("right");
         }
 
         this.background_bitmap.x -= this.background_speed;
@@ -324,10 +349,7 @@ changeCharacterAnimationToRunning(direction: string) {
             this.lastClickTime = currentTime;
             return false;
         }
-        else {
-            return false;
-        }
-        
+            return false;        
     }
 }
 

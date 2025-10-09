@@ -10,6 +10,9 @@ export class PausedState implements IGameState {
 
     enter() {
         console.log("Game Paused");
+        createjs.Ticker.paused = true;
+        this.game.pause_menu_container.visible = true;
+
         this.game.stage.update();
     }
 
@@ -18,7 +21,6 @@ export class PausedState implements IGameState {
     }
 
     update(event: any) {
-        // No updates in paused state
     }
 
     handleKeyDown(event: KeyboardEvent) {

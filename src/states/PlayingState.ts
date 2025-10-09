@@ -9,6 +9,8 @@ export class PlayingState implements IGameState {
     }
 
     enter() {
+        createjs.Ticker.paused = false;
+        this.game.pause_menu_container.visible = false;
         console.log("Game Started");
     }
     exit() {
