@@ -50,10 +50,12 @@ export class PlayingState implements IGameState {
     handleKeyUp(event: KeyboardEvent) {
         switch (event.keyCode) {
             case 37:
+                this.game.isDoubleClickActive = false;
                 this.game.isLeftPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
             case 39:
+                this.game.isDoubleClickActive = false;
                 this.game.isRightPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
@@ -93,6 +95,9 @@ export class Game{
 
     assetsPath = "assets/";
     private currentState!: IGameState;
+    lastClickTime = 0;
+    doubleClickThreshold = 300; // milliseconds
+    isDoubleClickActive = false;
 
     //backgroud variables
     background_bitmap: createjs.Bitmap = new createjs.Bitmap(this.assetsPath + "background.png");
@@ -122,6 +127,8 @@ export class Game{
     character_walking_left_image = new Image();
     character_walking_right_image = new Image();
     character_jumping_image = new Image();
+    character_running_left_image = new Image();
+    character_running_right_image = new Image();
 
     constructor(canvasId: string) {
         this.stage = new createjs.Stage(canvasId);
@@ -193,11 +200,15 @@ export class Game{
         this.character_walking_right_image.src = this.assetsPath + "character_walking_right.png";
         this.character_walking_left_image.src = this.assetsPath + "character_walking_left.png";
         this.character_jumping_image.src = this.assetsPath + "character_jumping.png";
+        this.character_running_left_image.src = this.assetsPath + "character_running_left.png";
+        this.character_running_right_image.src = this.assetsPath + "character_running_right.png";
 
         this.character_standing_image.onload = function() {};
         this.character_walking_left_image.onload = function() {};
         this.character_walking_right_image.onload = function() {};
         this.character_jumping_image.onload = function() {};
+        this.character_running_left_image.onload = function() {};
+        this.character_running_right_image.onload = function() {};
     }
     setupTicker() {
         createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
@@ -235,6 +246,15 @@ export class Game{
             this.character_bitmap.image = this.character_walking_right_image;
         }
     }
+
+changeCharacterAnimationToRunning(direction: string) {
+        if (direction === "left") {
+            this.character_bitmap.image = this.character_running_left_image;
+        }else if (direction === "right") {
+            this.character_bitmap.image = this.character_running_right_image;
+        }
+    }
+
     changeCharacterAnimationToJumping() {
         this.character_bitmap.image = this.character_jumping_image;
     }
@@ -253,9 +273,15 @@ export class Game{
     }
 
     handleMoveLeft() {
-        //TODO: checkif character is on ground before changing animation
+        if (this.isDoubleClick()) {
+            console.log("run left");
+            this.character_bitmap.x -= this.speed * 2;
+            this.changeCharacterAnimationToRunning("left");
+        }
+        else {
         this.character_bitmap.x -= this.speed;
         this.changeCharacterAnimationToWalking("left");
+        }
 
         this.background_bitmap.x += this.background_speed;
         this.fence_bitmap.x += this.fence_speed;
@@ -263,8 +289,15 @@ export class Game{
     }
 
     handleMoveRight() {
+        if (this.isDoubleClick()) {
+            console.log("run right");
+            this.character_bitmap.x += this.speed * 2;
+            this.changeCharacterAnimationToRunning("right");
+        }
+        else {
         this.character_bitmap.x += this.speed;
         this.changeCharacterAnimationToWalking("right");
+        }
 
         this.background_bitmap.x -= this.background_speed;
         this.fence_bitmap.x -= this.fence_speed;
@@ -277,7 +310,27 @@ export class Game{
             this.changeState(new PausedState(this));
         }
     }
+
+    isDoubleClick(): boolean {
+        let currentTime = new Date().getTime();
+        if ((currentTime - this.lastClickTime < this.doubleClickThreshold || this.isDoubleClickActive) && (currentTime - this.lastClickTime > 20 || this.isDoubleClickActive)) {
+            console.log('double');
+            this.isDoubleClickActive = true;
+            this.lastClickTime = 0;
+            return true;
+        }
+        else if (!this.isDoubleClickActive){
+            console.log('single');
+            this.lastClickTime = currentTime;
+            return false;
+        }
+        else {
+            return false;
+        }
+        
+    }
 }
+
 
 document.addEventListener("DOMContentLoaded", () => {
     const game = new Game("gameCanvas");

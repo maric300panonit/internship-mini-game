@@ -51,10 +51,12 @@ export class PlayingState implements IGameState {
     handleKeyUp(event: KeyboardEvent) {
         switch (event.keyCode) {
             case 37:
+                this.game.isDoubleClickActive = false;
                 this.game.isLeftPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
             case 39:
+                this.game.isDoubleClickActive = false;
                 this.game.isRightPressed = false;
                 this.game.changeCharacterAnimationToStanding();
                 break;
