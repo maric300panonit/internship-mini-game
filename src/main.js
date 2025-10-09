@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-var Game_1 = require("./Game");
+var Game_ts_1 = require("./Game.ts");
 window.onload = function () {
-    console.log("test");
-    var game = new Game_1.Game("miniGameCanvas");
+    var game = new Game_ts_1.Game("gameCanvas");
 };
