@@ -1,7 +1,6 @@
 import { IGameState } from "./IGameState.ts";
 import type { IGame } from "../IGame.ts";
 import { Character } from "../models/character.model.ts";
-import { environment } from "../env/env.ts";
 import { Keys } from "../constants.ts";
 import { InputManager } from "../InputManager.ts";
 

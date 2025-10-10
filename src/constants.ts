@@ -10,3 +10,7 @@ export const States = {
     PLAYING: "playing",
     PAUSED: "paused"
 }
+
+export const ASSETS_PATH = "assets/";
+
+export const GROUND_LEVEL = 400;
