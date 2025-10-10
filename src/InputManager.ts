@@ -16,7 +16,7 @@ export class InputManager {
         if (event.repeat) return; // Ignore auto-repeated keydown events
         if (event.keyCode === Keys.LEFT_ARROW || event.keyCode === Keys.RIGHT_ARROW) {
             const currentTime = Date.now();
-            if (currentTime - this.lastKeyTime < this.doubleClickThreshold && (currentTime - this.lastKeyTime > 20 || this.isSprinting)) {
+            if (currentTime - this.lastKeyTime < this.doubleClickThreshold) {
                 this.isSprinting = true;
             }
             this.lastKeyTime = currentTime;
