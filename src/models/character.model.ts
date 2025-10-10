@@ -1,4 +1,5 @@
-import { environment } from "../env/env";
+import { ASSETS_PATH, GROUND_LEVEL } from "../constants";
+
 export class Character {
     bitmap: createjs.Bitmap;
     speed: number;
@@ -25,12 +26,12 @@ export class Character {
 
     loadImages() {
 
-        this.character_standing_image.src = environment.assetsPath + "character_standing.png";
-        this.character_walking_right_image.src = environment.assetsPath + "character_walking_right.png";
-        this.character_walking_left_image.src = environment.assetsPath + "character_walking_left.png";
-        this.character_jumping_image.src = environment.assetsPath + "character_jumping.png";
-        this.character_running_left_image.src = environment.assetsPath + "character_running_left.png";
-        this.character_running_right_image.src = environment.assetsPath + "character_running_right.png";
+        this.character_standing_image.src = ASSETS_PATH + "character_standing.png";
+        this.character_walking_right_image.src = ASSETS_PATH + "character_walking_right.png";
+        this.character_walking_left_image.src = ASSETS_PATH + "character_walking_left.png";
+        this.character_jumping_image.src = ASSETS_PATH + "character_jumping.png";
+        this.character_running_left_image.src = ASSETS_PATH + "character_running_left.png";
+        this.character_running_right_image.src = ASSETS_PATH + "character_running_right.png";
 
         this.character_standing_image.onload = function() {};
         this.character_walking_left_image.onload = function() {};
@@ -65,7 +66,7 @@ export class Character {
     }
 
     isOnGround(bitmap: createjs.Bitmap) {
-        if (bitmap.y === environment.ground_level) {
+        if (bitmap.y === GROUND_LEVEL) {
             return true;
         }
         return false;
@@ -74,7 +75,7 @@ export class Character {
     jump() {
         createjs.Tween.get(this.bitmap)
             .to({ y: this.bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
-            .to({ y: environment.ground_level }, this.jumpduration / 2, createjs.Ease.quadIn);
+            .to({ y: GROUND_LEVEL }, this.jumpduration / 2, createjs.Ease.quadIn);
     }
 
     canMoveLeft() {
@@ -91,60 +92,24 @@ export class Character {
         return false;
     }
 
-    move(direction: string, isDoubleClick: boolean) {
-        if (direction === "left") {
+    move(direction: string, isSprinting: boolean) {
 
-            if (isDoubleClick) {
-                console.log("run left");
-                this.bitmap.x -= this.speed * 2;
-                this.changeAnimationToRunning("left");
-            }
-            else {
-                this.bitmap.x -= this.speed;
-                this.changeAnimationToWalking("left");
-            }
-        } else if (direction === "right") {
+        if (direction === "left" && this.canMoveLeft()) {
 
-            if (isDoubleClick) {
-                console.log("run right");
-                this.bitmap.x += this.speed * 2;
-                this.changeAnimationToRunning("right");
-            }
-            else {
-                this.bitmap.x += this.speed;
-                this.changeAnimationToWalking("right");
-            }
+            isSprinting ? this.bitmap.x -= this.speed * 2 : this.bitmap.x -= this.speed;
+            isSprinting ? this.changeAnimationToRunning("left") : this.changeAnimationToWalking("left");
+
+        } else if (direction === "right" && this.canMoveRight()) {
+
+            isSprinting ? this.bitmap.x += this.speed * 2 : this.bitmap.x += this.speed;
+            isSprinting ? this.changeAnimationToRunning("right") : this.changeAnimationToWalking("right");
         }
     }
 
     update() {
-        if (!this.isOnGround(this.bitmap)) {
-            this.changeAnimationToJumping();
-        } else {
-            this.changeAnimationToStanding();
-        }
-        if (this.isLeftPressed && this.canMoveLeft()) {
-            this.move("left",this.isDoubleClick());
-        }
-        if (this.isRightPressed && this.canMoveRight()) {
-            this.move("right",this.isDoubleClick());
-        }
+        
     }
 
-    isDoubleClick(): boolean {
-        let currentTime = new Date().getTime();
-        if ((currentTime - environment.lastClickTime < environment.doubleClickThreshold || environment.isDoubleClickActive) && (currentTime - environment.lastClickTime > 20 || environment.isDoubleClickActive)) {
-            console.log('double');
-            environment.isDoubleClickActive = true;
-            environment.lastClickTime = 0;
-            return true;
-        }
-        else if (!environment.isDoubleClickActive){
-            console.log('single');
-            environment.lastClickTime = currentTime;
-            return false;
-        }
-            return false;        
-    }
+    
 
 }

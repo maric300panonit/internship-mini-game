@@ -7,5 +7,6 @@ export interface IGame {
     pause_menu_container: createjs.Container;
     stage: createjs.Stage;
     transitionTo(stateName: string): void;
+    updateBackgroundLayers(characterMovement: number): void;
     // Add more as needed for state logic
 }
