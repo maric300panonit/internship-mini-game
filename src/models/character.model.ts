@@ -54,6 +54,7 @@ export class Character {
         createjs.Tween.get(this.bitmap)
             .to({ y: this.bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
             .to({ y: GROUND_LEVEL }, this.jumpduration / 2, createjs.Ease.quadIn);
+        this.assetManager.playSound("thud", 240)
     }
 
     canMoveLeft() {
