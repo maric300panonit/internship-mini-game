@@ -34,7 +34,6 @@ export class Game{
     }
 
     initialize() {
-        this.character = new Character(new createjs.Bitmap(this.assetManager.getResult("character_standing")), 5, 100, 500, this.assetManager);
         this.setupBackgroundLayers();
         this.setupCharacter();
         this.setupPauseMenu();
@@ -42,7 +41,6 @@ export class Game{
         this.setupEventListeners();
 
         this.inputManager = new InputManager();
-
         this.currentState = new PlayingState(this, this.character, this.inputManager);
         this.currentState.enter();
     }
@@ -71,8 +69,12 @@ export class Game{
             layer.bitmap.x -= characterMovement * layer.speed;
         });
     }
-    private update(event: any) {
-            this.currentState.update(event);
+
+    setupCharacter() {
+        this.character = new Character(new createjs.Bitmap(this.assetManager.getResult("character_standing")), 5, 100, 500, this.assetManager);
+
+        this.character.bitmap.y = GROUND_LEVEL;
+        this.stage.addChild(this.character.bitmap);
     }
 
     setupPauseMenu() {
@@ -87,10 +89,19 @@ export class Game{
         this.pause_menu_container.visible = false;
     }
 
-    changeState(newState: IGameState) {
-        this.currentState.exit();
-        this.currentState = newState;
-        this.currentState.enter();
+    setupTicker() {
+    createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+    createjs.Ticker.framerate = 60;
+    createjs.Ticker.addEventListener("tick", this.update.bind(this));
+    }
+    
+    setupEventListeners() {
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
+        window.addEventListener("keyup", this.handleKeyUp.bind(this));
+    }
+
+    private update(event: any) {
+        this.currentState.update(event);
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -100,27 +111,18 @@ export class Game{
         this.currentState.handleKeyUp(event);
     }
 
-    setupCharacter() {
-        this.character.bitmap.y = GROUND_LEVEL;
-        this.stage.addChild(this.character.bitmap);
-    }
-
-    setupTicker() {
-        createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.addEventListener("tick", this.update.bind(this));
-    }
-    setupEventListeners() {
-        window.addEventListener("keydown", this.handleKeyDown.bind(this));
-        window.addEventListener("keyup", this.handleKeyUp.bind(this));
-    }
-
     transitionTo(stateName: string) {
         if (stateName === States.PLAYING) {
             this.changeState(new PlayingState(this, this.character, this.inputManager));
         } else if (stateName === States.PAUSED) {
             this.changeState(new PausedState(this, this.character));
         }
+    }
+
+    changeState(newState: IGameState) {
+        this.currentState.exit();
+        this.currentState = newState;
+        this.currentState.enter();
     }
 
 }
