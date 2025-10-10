@@ -91,60 +91,24 @@ export class Character {
         return false;
     }
 
-    move(direction: string, isDoubleClick: boolean) {
-        if (direction === "left") {
+    move(direction: string, isSprinting: boolean) {
 
-            if (isDoubleClick) {
-                console.log("run left");
-                this.bitmap.x -= this.speed * 2;
-                this.changeAnimationToRunning("left");
-            }
-            else {
-                this.bitmap.x -= this.speed;
-                this.changeAnimationToWalking("left");
-            }
-        } else if (direction === "right") {
+        if (direction === "left" && this.canMoveLeft()) {
 
-            if (isDoubleClick) {
-                console.log("run right");
-                this.bitmap.x += this.speed * 2;
-                this.changeAnimationToRunning("right");
-            }
-            else {
-                this.bitmap.x += this.speed;
-                this.changeAnimationToWalking("right");
-            }
+            isSprinting ? this.bitmap.x -= this.speed * 2 : this.bitmap.x -= this.speed;
+            isSprinting ? this.changeAnimationToRunning("left") : this.changeAnimationToWalking("left");
+
+        } else if (direction === "right" && this.canMoveRight()) {
+
+            isSprinting ? this.bitmap.x += this.speed * 2 : this.bitmap.x += this.speed;
+            isSprinting ? this.changeAnimationToRunning("right") : this.changeAnimationToWalking("right");
         }
     }
 
     update() {
-        if (!this.isOnGround(this.bitmap)) {
-            this.changeAnimationToJumping();
-        } else {
-            this.changeAnimationToStanding();
-        }
-        if (this.isLeftPressed && this.canMoveLeft()) {
-            this.move("left",this.isDoubleClick());
-        }
-        if (this.isRightPressed && this.canMoveRight()) {
-            this.move("right",this.isDoubleClick());
-        }
+        
     }
 
-    isDoubleClick(): boolean {
-        let currentTime = new Date().getTime();
-        if ((currentTime - environment.lastClickTime < environment.doubleClickThreshold || environment.isDoubleClickActive) && (currentTime - environment.lastClickTime > 20 || environment.isDoubleClickActive)) {
-            console.log('double');
-            environment.isDoubleClickActive = true;
-            environment.lastClickTime = 0;
-            return true;
-        }
-        else if (!environment.isDoubleClickActive){
-            console.log('single');
-            environment.lastClickTime = currentTime;
-            return false;
-        }
-            return false;        
-    }
+    
 
 }

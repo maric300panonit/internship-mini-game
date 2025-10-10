@@ -3,10 +3,13 @@ import { PlayingState } from "./states/PlayingState.ts";
 import { PausedState } from "./states/PausedState.ts";
 import { environment } from "./env/env.ts";
 import { Character } from "./models/character.model.ts";
+import { InputManager } from "./InputManager.ts";
+import { States } from "./constants.ts";
 export class Game{
     stage: createjs.Stage;
 
     private currentState!: IGameState;
+    private inputManager!: InputManager;
 
     //backgroud variables
     background_bitmap: createjs.Bitmap = new createjs.Bitmap(environment.assetsPath + "background.png");
@@ -47,8 +50,9 @@ export class Game{
         this.setupTicker();
         this.setupEventListeners();
 
-        // Set initial state to PlayingState
-        this.currentState = new PlayingState(this, this.character);
+        this.inputManager = new InputManager();
+
+        this.currentState = new PlayingState(this, this.character, this.inputManager);
         this.currentState.enter();
     }
 
@@ -115,9 +119,9 @@ export class Game{
     }
 
     transitionTo(stateName: string) {
-        if (stateName === "playing") {
-            this.changeState(new PlayingState(this, this.character));
-        } else if (stateName === "paused") {
+        if (stateName === States.PLAYING) {
+            this.changeState(new PlayingState(this, this.character, this.inputManager));
+        } else if (stateName === States.PAUSED) {
             this.changeState(new PausedState(this, this.character));
         }
     }
