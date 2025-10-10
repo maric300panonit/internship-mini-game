@@ -5,26 +5,20 @@ import { environment } from "./env/env.ts";
 import { Character } from "./models/character.model.ts";
 import { InputManager } from "./InputManager.ts";
 import { States } from "./constants.ts";
+import { IBackgroundLayer } from "./IBackgroundLayer.ts";
 export class Game{
     stage: createjs.Stage;
 
     private currentState!: IGameState;
     private inputManager!: InputManager;
 
-    //backgroud variables
-    background_bitmap: createjs.Bitmap = new createjs.Bitmap(environment.assetsPath + "background.png");
-    background_speed = 1;
+    private backgroundLayers: IBackgroundLayer[] = [];
 
     //balcony variables
     balcony_shape: createjs.Shape = new createjs.Shape();
     balcony_y = environment.ground_level + 400;
     balcony_shape_height = 200;
     balcony_shape_width = 1920;
-
-    //fence variables
-    fence_bitmap: createjs.Bitmap = new createjs.Bitmap(environment.assetsPath + "fence.png");
-    fence_speed = 2.5;
-    fence_bitmap_x = -75;
 
     //character variables
     character = new Character(new createjs.Bitmap(environment.assetsPath + "character_standing.png"), 5, 100, 500);
@@ -42,9 +36,8 @@ export class Game{
     }
 
     initialize() {
-        this.setupBackground();
+        this.setupBackgroundLayers();
         this.setupBalcony();
-        this.setupFence();
         this.setupCharacter();
         this.setupPauseMenu();
         this.setupTicker();
@@ -56,6 +49,25 @@ export class Game{
         this.currentState.enter();
     }
 
+    setupBackgroundLayers() {
+        const background_bitmap: createjs.Bitmap = new createjs.Bitmap(environment.assetsPath + "background.png");
+        background_bitmap.y = -300;
+        this.backgroundLayers.push({ bitmap: background_bitmap, speed: 0.2 });
+
+        const fence_bitmap: createjs.Bitmap = new createjs.Bitmap(environment.assetsPath + "fence.png");
+        fence_bitmap.y = environment.ground_level + 250;
+        fence_bitmap.x = -75;
+        this.backgroundLayers.push({ bitmap: fence_bitmap, speed: 0.5 });
+
+        this.stage.addChild(background_bitmap);
+        this.stage.addChild(fence_bitmap);
+    }
+
+    updateBackgroundLayers(characterMovement: number) {
+        this.backgroundLayers.forEach(layer => {
+            layer.bitmap.x -= characterMovement * layer.speed;
+        });
+    }
     private update(event: any) {
             this.currentState.update(event);
     }
@@ -85,22 +97,11 @@ export class Game{
         this.currentState.handleKeyUp(event);
     }
 
-
-    setupBackground() {
-        this.stage.addChild(this.background_bitmap);
-        this.background_bitmap.y -= 300;
-    }
-
     setupBalcony() {
         this.balcony_shape = new createjs.Shape();
         this.balcony_shape.graphics.beginFill("gray").drawRect(0, 0, this.balcony_shape_width, this.balcony_shape_height);
         this.balcony_shape.y = environment.ground_level + 400;
         this.stage.addChild(this.balcony_shape);
-    }
-
-    setupFence() {
-        this.stage.addChild(this.fence_bitmap);
-        this.fence_bitmap.y = environment.ground_level + 250;
     }
 
     setupCharacter() {

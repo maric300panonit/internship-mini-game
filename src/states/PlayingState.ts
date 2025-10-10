@@ -9,6 +9,7 @@ export class PlayingState implements IGameState {
     private game: IGame;
     private character: Character;
     private inputManager: InputManager;
+    private characterMovement: number = 0;
 
     constructor(game: IGame, character: Character, inputManager: InputManager) {
         this.game = game;
@@ -28,11 +29,15 @@ export class PlayingState implements IGameState {
     update() {
         if (this.inputManager.moveLeft) {
             this.character.move("left", this.inputManager.isSprinting);
+            this.characterMovement = this.inputManager.isSprinting ? this.character.speed * -2 : this.character.speed * -1;
         } else if (this.inputManager.moveRight) {
             this.character.move("right", this.inputManager.isSprinting);
+            this.characterMovement = this.inputManager.isSprinting ? this.character.speed * 2 : this.character.speed;
         } else {
             this.character.changeAnimationToStanding();
+            this.characterMovement = 0;
         }
+        this.game.updateBackgroundLayers(this.characterMovement);
         this.game.stage.update();
     }
 
@@ -44,7 +49,7 @@ export class PlayingState implements IGameState {
                     this.character.changeAnimationToJumping();
                 }
                 break;
-            case Keys.P: // 'P' key to pause
+            case Keys.P:
                 this.game.transitionTo("paused");
                 break;
         }
