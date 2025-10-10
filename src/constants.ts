@@ -13,4 +13,4 @@ export const States = {
 
 export const ASSETS_PATH = "assets/";
 
-export const GROUND_LEVEL = 400;
+export const GROUND_LEVEL = 350;
