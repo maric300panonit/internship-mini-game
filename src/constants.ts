@@ -5,3 +5,8 @@ export enum Keys {
     DOWN_ARROW = 40,
     P = 80
 }
+
+export const States = {
+    PLAYING: "playing",
+    PAUSED: "paused"
+}
