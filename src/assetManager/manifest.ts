@@ -11,3 +11,7 @@ export const assetManifest = [
     { id: "fence", src: ASSETS_PATH + "fence.png" },
     { id: "gray_wall", src: ASSETS_PATH + "gray_wall.png" }
 ];
+
+export const soundManifest = [
+    {src: ASSETS_PATH + "thud.mp3", id: "thud"}
+]
