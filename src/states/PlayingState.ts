@@ -26,10 +26,10 @@ export class PlayingState implements IGameState {
     }
 
     update() {
-        if (this.inputManager.moveLeft) {
+        if (this.inputManager.moveLeft && this.character.canMoveLeft()) {
             this.character.move("left", this.inputManager.isSprinting);
             this.characterMovement = this.inputManager.isSprinting ? this.character.speed * -2 : this.character.speed * -1;
-        } else if (this.inputManager.moveRight) {
+        } else if (this.inputManager.moveRight && this.character.canMoveRight()) {
             this.character.move("right", this.inputManager.isSprinting);
             this.characterMovement = this.inputManager.isSprinting ? this.character.speed * 2 : this.character.speed;
         } else {

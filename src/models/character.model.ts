@@ -72,12 +72,12 @@ export class Character {
 
     move(direction: string, isSprinting: boolean) {
 
-        if (direction === "left" && this.canMoveLeft()) {
+        if (direction === "left") {
 
             isSprinting ? this.bitmap.x -= this.speed * 2 : this.bitmap.x -= this.speed;
             isSprinting ? this.changeAnimationToRunning("left") : this.changeAnimationToWalking("left");
 
-        } else if (direction === "right" && this.canMoveRight()) {
+        } else if (direction === "right") {
 
             isSprinting ? this.bitmap.x += this.speed * 2 : this.bitmap.x += this.speed;
             isSprinting ? this.changeAnimationToRunning("right") : this.changeAnimationToWalking("right");
