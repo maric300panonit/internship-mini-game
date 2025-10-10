@@ -1,4 +1,5 @@
 import { ASSETS_PATH, GROUND_LEVEL } from "../constants";
+import { AssetManager } from "../assetManager/AssetManager";
 
 export class Character {
     bitmap: createjs.Bitmap;
@@ -7,62 +8,39 @@ export class Character {
     jumpduration: number;
     isLeftPressed = false;
     isRightPressed = false;
+    assetManager: AssetManager;
 
-    character_standing_image = new Image();
-    character_walking_left_image = new Image();
-    character_walking_right_image = new Image();
-    character_jumping_image = new Image();
-    character_running_left_image = new Image();
-    character_running_right_image = new Image();
-
-    constructor(bitmap: createjs.Bitmap, speed: number, jumpheight: number, jumpduration: number) {
+    constructor(bitmap: createjs.Bitmap, speed: number, jumpheight: number, jumpduration: number, assetManager: AssetManager) {
         this.bitmap = bitmap;
         this.speed = speed;
         this.jumpheight = jumpheight;
         this.jumpduration = jumpduration;
+        this.assetManager = assetManager;
 
-        this.loadImages();
-    }
-
-    loadImages() {
-
-        this.character_standing_image.src = ASSETS_PATH + "character_standing.png";
-        this.character_walking_right_image.src = ASSETS_PATH + "character_walking_right.png";
-        this.character_walking_left_image.src = ASSETS_PATH + "character_walking_left.png";
-        this.character_jumping_image.src = ASSETS_PATH + "character_jumping.png";
-        this.character_running_left_image.src = ASSETS_PATH + "character_running_left.png";
-        this.character_running_right_image.src = ASSETS_PATH + "character_running_right.png";
-
-        this.character_standing_image.onload = function() {};
-        this.character_walking_left_image.onload = function() {};
-        this.character_walking_right_image.onload = function() {};
-        this.character_jumping_image.onload = function() {};
-        this.character_running_left_image.onload = function() {};
-        this.character_running_right_image.onload = function() {};
     }
 
     changeAnimationToStanding() {
-        this.bitmap.image = this.character_standing_image;
+        this.bitmap.image = this.assetManager.getResult("character_standing");
     }
 
     changeAnimationToWalking(direction: string) {
         if (direction === "left") {
-            this.bitmap.image = this.character_walking_left_image;
+            this.bitmap.image = this.assetManager.getResult("character_walking_left");
         }else if (direction === "right") {
-            this.bitmap.image = this.character_walking_right_image;
+            this.bitmap.image = this.assetManager.getResult("character_walking_right");
         }
     }
 
     changeAnimationToRunning(direction: string) {
         if (direction === "left") {
-            this.bitmap.image = this.character_running_left_image;
+            this.bitmap.image = this.assetManager.getResult("character_running_left");
         }else if (direction === "right") {
-            this.bitmap.image = this.character_running_right_image;
+            this.bitmap.image = this.assetManager.getResult("character_running_right");
         }
     }
 
     changeAnimationToJumping() {
-        this.bitmap.image = this.character_jumping_image;
+        this.bitmap.image = this.assetManager.getResult("character_jumping");
     }
 
     isOnGround(bitmap: createjs.Bitmap) {
@@ -94,12 +72,12 @@ export class Character {
 
     move(direction: string, isSprinting: boolean) {
 
-        if (direction === "left" && this.canMoveLeft()) {
+        if (direction === "left") {
 
             isSprinting ? this.bitmap.x -= this.speed * 2 : this.bitmap.x -= this.speed;
             isSprinting ? this.changeAnimationToRunning("left") : this.changeAnimationToWalking("left");
 
-        } else if (direction === "right" && this.canMoveRight()) {
+        } else if (direction === "right") {
 
             isSprinting ? this.bitmap.x += this.speed * 2 : this.bitmap.x += this.speed;
             isSprinting ? this.changeAnimationToRunning("right") : this.changeAnimationToWalking("right");

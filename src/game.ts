@@ -5,19 +5,19 @@ import { Character } from "./models/character.model.ts";
 import { InputManager } from "./InputManager.ts";
 import { States } from "./constants.ts";
 import { IBackgroundLayer } from "./IBackgroundLayer.ts";
-import { ASSETS_PATH } from "./constants.ts";
 import { GROUND_LEVEL } from "./constants.ts";
+import { AssetManager } from "./assetManager/AssetManager.ts";
 export class Game{
     stage: createjs.Stage;
 
     private currentState!: IGameState;
     private inputManager!: InputManager;
+    private assetManager = new AssetManager();
 
     private backgroundLayers: IBackgroundLayer[] = [];
 
     //character variables
-    character = new Character(new createjs.Bitmap(ASSETS_PATH + "character_standing.png"), 5, 100, 500);
-
+    character!: Character;
     //pausemenu variables
     pause_menu_container: createjs.Container = new createjs.Container();    
     pause_menu_shape: createjs.Shape = new createjs.Shape();
@@ -27,33 +27,34 @@ export class Game{
 
     constructor(canvasId: string) {
         this.stage = new createjs.Stage(canvasId);
-        this.initialize();
+        this.assetManager = new AssetManager();
+        this.assetManager.loadAssets(() => {
+            this.initialize();
+        });
     }
 
     initialize() {
         this.setupBackgroundLayers();
-        this.setupBalcony();
         this.setupCharacter();
         this.setupPauseMenu();
         this.setupTicker();
         this.setupEventListeners();
 
         this.inputManager = new InputManager();
-
         this.currentState = new PlayingState(this, this.character, this.inputManager);
         this.currentState.enter();
     }
 
     setupBackgroundLayers() {
-        const background_bitmap: createjs.Bitmap = new createjs.Bitmap(ASSETS_PATH + "background.png");
+        const background_bitmap: createjs.Bitmap = new createjs.Bitmap(this.assetManager.getResult("background"));
         background_bitmap.y = -300;
         this.backgroundLayers.push({ bitmap: background_bitmap, speed: 0.2 });
 
-        const balcony_bitmap: createjs.Bitmap = new createjs.Bitmap(ASSETS_PATH + "gray_wall.png");
+        const balcony_bitmap: createjs.Bitmap = new createjs.Bitmap(this.assetManager.getResult("gray_wall"));
         balcony_bitmap.y = GROUND_LEVEL + 400;
         this.backgroundLayers.push({bitmap: balcony_bitmap, speed: 0.5});
 
-        const fence_bitmap: createjs.Bitmap = new createjs.Bitmap(ASSETS_PATH + "fence.png");
+        const fence_bitmap: createjs.Bitmap = new createjs.Bitmap(this.assetManager.getResult("fence"));
         fence_bitmap.y = GROUND_LEVEL + 250;
         fence_bitmap.x = -75;
         this.backgroundLayers.push({ bitmap: fence_bitmap, speed: 0.5 });
@@ -68,8 +69,12 @@ export class Game{
             layer.bitmap.x -= characterMovement * layer.speed;
         });
     }
-    private update(event: any) {
-            this.currentState.update(event);
+
+    setupCharacter() {
+        this.character = new Character(new createjs.Bitmap(this.assetManager.getResult("character_standing")), 5, 100, 500, this.assetManager);
+
+        this.character.bitmap.y = GROUND_LEVEL;
+        this.stage.addChild(this.character.bitmap);
     }
 
     setupPauseMenu() {
@@ -84,10 +89,19 @@ export class Game{
         this.pause_menu_container.visible = false;
     }
 
-    changeState(newState: IGameState) {
-        this.currentState.exit();
-        this.currentState = newState;
-        this.currentState.enter();
+    setupTicker() {
+    createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
+    createjs.Ticker.framerate = 60;
+    createjs.Ticker.addEventListener("tick", this.update.bind(this));
+    }
+    
+    setupEventListeners() {
+        window.addEventListener("keydown", this.handleKeyDown.bind(this));
+        window.addEventListener("keyup", this.handleKeyUp.bind(this));
+    }
+
+    private update(event: any) {
+        this.currentState.update(event);
     }
 
     handleKeyDown(event: KeyboardEvent) {
@@ -97,34 +111,18 @@ export class Game{
         this.currentState.handleKeyUp(event);
     }
 
-    setupBalcony() {
-        this.balcony_shape = new createjs.Shape();
-        this.balcony_shape.graphics.beginFill("gray").drawRect(0, 0, this.balcony_shape_width, this.balcony_shape_height);
-        this.balcony_shape.y = GROUND_LEVEL + 400;
-        this.stage.addChild(this.balcony_shape);
-    }
-
-    setupCharacter() {
-        this.character.bitmap.y = GROUND_LEVEL;
-        this.stage.addChild(this.character.bitmap);
-    }
-
-    setupTicker() {
-        createjs.Ticker.timingMode = createjs.Ticker.RAF_SYNCHED;
-        createjs.Ticker.framerate = 60;
-        createjs.Ticker.addEventListener("tick", this.update.bind(this));
-    }
-    setupEventListeners() {
-        window.addEventListener("keydown", this.handleKeyDown.bind(this));
-        window.addEventListener("keyup", this.handleKeyUp.bind(this));
-    }
-
     transitionTo(stateName: string) {
         if (stateName === States.PLAYING) {
             this.changeState(new PlayingState(this, this.character, this.inputManager));
         } else if (stateName === States.PAUSED) {
             this.changeState(new PausedState(this, this.character));
         }
+    }
+
+    changeState(newState: IGameState) {
+        this.currentState.exit();
+        this.currentState = newState;
+        this.currentState.enter();
     }
 
 }
