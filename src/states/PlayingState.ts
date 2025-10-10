@@ -2,6 +2,7 @@ import { IGameState } from "./IGameState.ts";
 import type { IGame } from "../IGame.ts";
 import { Character } from "../models/character.model.ts";
 import { environment } from "../env/env.ts";
+import { Keys } from "../constants.ts";
 
 export class PlayingState implements IGameState {
     private game: IGame;
@@ -28,31 +29,31 @@ export class PlayingState implements IGameState {
 
     handleKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
-            case 37:
+            case Keys.LEFT_ARROW:
                 this.character.isLeftPressed = true;
                 break;
-            case 38:
+            case Keys.UP_ARROW:
                 if (this.character.isOnGround(this.character.bitmap)) {
                     this.character.jump();
                     this.character.changeAnimationToJumping();
                 }
                 break;
-            case 39:
+            case Keys.RIGHT_ARROW:
                 this.character.isRightPressed = true;
                 break;
-            case 80: // 'P' key to pause
+            case Keys.P: // 'P' key to pause
                 this.game.transitionTo("paused");
                 break;
         }
     }
     handleKeyUp(event: KeyboardEvent) {
         switch (event.keyCode) {
-            case 37:
+            case Keys.LEFT_ARROW:
                 environment.isDoubleClickActive = false;
                 this.character.isLeftPressed = false;
                 this.character.changeAnimationToStanding();
                 break;
-            case 39:
+            case Keys.RIGHT_ARROW:
                 environment.isDoubleClickActive = false;
                 this.character.isRightPressed = false;
                 this.character.changeAnimationToStanding();
