@@ -3,14 +3,17 @@ import type { IGame } from "../IGame.ts";
 import { Character } from "../models/character.model.ts";
 import { environment } from "../env/env.ts";
 import { Keys } from "../constants.ts";
+import { InputManager } from "../InputManager.ts";
 
 export class PlayingState implements IGameState {
     private game: IGame;
     private character: Character;
+    private inputManager: InputManager;
 
-    constructor(game: IGame, character: Character) {
+    constructor(game: IGame, character: Character, inputManager: InputManager) {
         this.game = game;
         this.character = character;
+        this.inputManager = inputManager;
     }
 
     enter() {
@@ -23,23 +26,23 @@ export class PlayingState implements IGameState {
     }
 
     update() {
-        this.character.update();
+        if (this.inputManager.moveLeft) {
+            this.character.move("left", this.inputManager.isSprinting);
+        } else if (this.inputManager.moveRight) {
+            this.character.move("right", this.inputManager.isSprinting);
+        } else {
+            this.character.changeAnimationToStanding();
+        }
         this.game.stage.update();
     }
 
     handleKeyDown(event: KeyboardEvent) {
         switch (event.keyCode) {
-            case Keys.LEFT_ARROW:
-                this.character.isLeftPressed = true;
-                break;
             case Keys.UP_ARROW:
                 if (this.character.isOnGround(this.character.bitmap)) {
                     this.character.jump();
                     this.character.changeAnimationToJumping();
                 }
-                break;
-            case Keys.RIGHT_ARROW:
-                this.character.isRightPressed = true;
                 break;
             case Keys.P: // 'P' key to pause
                 this.game.transitionTo("paused");
@@ -47,17 +50,6 @@ export class PlayingState implements IGameState {
         }
     }
     handleKeyUp(event: KeyboardEvent) {
-        switch (event.keyCode) {
-            case Keys.LEFT_ARROW:
-                environment.isDoubleClickActive = false;
-                this.character.isLeftPressed = false;
-                this.character.changeAnimationToStanding();
-                break;
-            case Keys.RIGHT_ARROW:
-                environment.isDoubleClickActive = false;
-                this.character.isRightPressed = false;
-                this.character.changeAnimationToStanding();
-                break;
-        }
+
     }
 }
