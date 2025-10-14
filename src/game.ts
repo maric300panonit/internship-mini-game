@@ -27,6 +27,10 @@ export class Game{
 
     constructor(canvasId: string) {
         this.stage = new createjs.Stage(canvasId);
+
+        this.stage.canvas.width = window.innerWidth;
+        this.stage.canvas.height = window.innerHeight;
+        
         this.assetManager = new AssetManager();
         this.assetManager.loadAssets(() => {
             this.initialize();
