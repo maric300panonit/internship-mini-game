@@ -1,0 +1,16 @@
+{
+  "dependencies": {
+    "createjs-module": "^0.8.3",
+    "typescript": "^5.9.3"
+  },
+  "type" : "module",
+  "devDependencies": {
+    "@types/createjs": "^0.0.32",
+    "vite": "^7.1.9"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "serve": "vite preview"
+  }
+}
