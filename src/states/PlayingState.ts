@@ -9,6 +9,7 @@ export class PlayingState implements IGameState {
     private character: Character;
     private inputManager: InputManager;
     private characterMovement: number = 0;
+    private gravity: number = 10;
 
     constructor(game: IGame, character: Character, inputManager: InputManager) {
         this.game = game;
@@ -26,6 +27,9 @@ export class PlayingState implements IGameState {
     }
 
     update() {
+        if (!this.character.isOnGround(this.character.bitmap) && !this.character.isJumping) {
+            this.character.bitmap.y += this.gravity;
+        }
         if (this.inputManager.moveLeft && this.character.canMoveLeft()) {
             this.character.move("left", this.inputManager.isSprinting);
             this.characterMovement = this.inputManager.isSprinting ? this.character.speed * -2 : this.character.speed * -1;

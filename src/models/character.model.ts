@@ -9,6 +9,7 @@ export class Character implements ISerializable<ICharacterSaveData> {
     jumpduration: number;
     isLeftPressed = false;
     isRightPressed = false;
+    isJumping = false;
     assetManager: AssetManager;
     jumpCount: number;
     distanceTraveled: number;
@@ -49,7 +50,7 @@ export class Character implements ISerializable<ICharacterSaveData> {
     }
 
     isOnGround(bitmap: createjs.Bitmap) {
-        if (bitmap.y === GROUND_LEVEL) {
+        if (bitmap.y >= GROUND_LEVEL) {
             return true;
         }
         return false;
@@ -57,9 +58,11 @@ export class Character implements ISerializable<ICharacterSaveData> {
 
     jump() {
         this.jumpCount += 1;
+        this.isJumping = true;
         createjs.Tween.get(this.bitmap)
             .to({ y: this.bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
-            .to({ y: GROUND_LEVEL }, this.jumpduration / 2, createjs.Ease.quadIn);
+            .to({ y: GROUND_LEVEL }, this.jumpduration / 2, createjs.Ease.quadIn)
+            .call(() => {this.isJumping = false; });
     }
 
     canMoveLeft() {
