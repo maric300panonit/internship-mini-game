@@ -94,11 +94,11 @@ export class Game implements ISerializable<ISaveFile> {
     }
 
     setupLabels() {
-        this.distanceTraveledLabel = new createjs.Text("distance traveled: " + this.character.distanceTraveled.toString(), "48px Arial");
+        this.distanceTraveledLabel = new createjs.Text("distance traveled: " + this.character.distanceTraveled.toString(), "36px Arial");
         this.distanceTraveledLabel.y = 10;
         this.labelContainer.addChild(this.distanceTraveledLabel)
 
-        this.jumpCountLabel = new createjs.Text("jump count: " + this.character.jumpCount.toString(), "48px Arial");
+        this.jumpCountLabel = new createjs.Text("jump count: " + this.character.jumpCount.toString(), "36px Arial");
         this.jumpCountLabel.y = 65;
         this.labelContainer.addChild(this.jumpCountLabel);
 
