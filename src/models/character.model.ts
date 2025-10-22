@@ -1,7 +1,8 @@
 import { ASSETS_PATH, GROUND_LEVEL } from "../constants";
 import { AssetManager } from "../assetManager/AssetManager";
-
-export class Character {
+import { ISerializable } from "../saveManager/ISerializable";
+import { ICharacterSaveData } from "../saveManager/ISaveData";
+export class Character implements ISerializable<ICharacterSaveData> {
     bitmap: createjs.Bitmap;
     speed: number;
     jumpheight: number;
@@ -9,6 +10,8 @@ export class Character {
     isLeftPressed = false;
     isRightPressed = false;
     assetManager: AssetManager;
+    jumpCount: number;
+    distanceTraveled: number;
 
     constructor(bitmap: createjs.Bitmap, speed: number, jumpheight: number, jumpduration: number, assetManager: AssetManager) {
         this.bitmap = bitmap;
@@ -16,6 +19,8 @@ export class Character {
         this.jumpheight = jumpheight;
         this.jumpduration = jumpduration;
         this.assetManager = assetManager;
+        this.jumpCount = 0;
+        this.distanceTraveled = 0;
 
     }
 
@@ -51,6 +56,7 @@ export class Character {
     }
 
     jump() {
+        this.jumpCount += 1;
         createjs.Tween.get(this.bitmap)
             .to({ y: this.bitmap.y - this.jumpheight }, this.jumpduration / 2, createjs.Ease.quadOut)
             .to({ y: GROUND_LEVEL }, this.jumpduration / 2, createjs.Ease.quadIn);
@@ -71,6 +77,8 @@ export class Character {
     }
 
     move(direction: string, isSprinting: boolean) {
+        
+        isSprinting ? this.distanceTraveled += this.speed * 2 : this.distanceTraveled += this.speed;
 
         if (direction === "left") {
 
@@ -88,6 +96,21 @@ export class Character {
         
     }
 
+    public serialize(): ICharacterSaveData {
+        return {
+            x: this.bitmap.x,
+            y: this.bitmap.y,
+            distanceTraveled: this.distanceTraveled,
+            jumpCount: this.jumpCount
+        }
+    }
+
+    public deserialize(data: ICharacterSaveData): void {
+        this.bitmap.x = data.x;
+        this.bitmap.y = data.y;
+        this.distanceTraveled = data.distanceTraveled;
+        this.jumpCount = data.jumpCount;
+    }
     
 
 }
