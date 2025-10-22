@@ -173,7 +173,7 @@ export class Game implements ISerializable<ISaveFile> {
             const saveFile: ISaveFile = this.serialize();
 
             this.saveManager.save(saveFile, "savegame.xml");
-
+            this.transitionTo(States.PLAYING);
             console.log("Save complete.");
         } catch (error) {
             console.error("Error during save:", error);
