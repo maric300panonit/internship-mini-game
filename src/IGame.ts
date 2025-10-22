@@ -8,5 +8,6 @@ export interface IGame {
     stage: createjs.Stage;
     transitionTo(stateName: string): void;
     updateBackgroundLayers(characterMovement: number): void;
+    updateLabels(): void;
     // Add more as needed for state logic
 }
