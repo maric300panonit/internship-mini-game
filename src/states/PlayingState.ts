@@ -37,6 +37,7 @@ export class PlayingState implements IGameState {
             this.characterMovement = 0;
         }
         this.game.updateBackgroundLayers(this.characterMovement);
+        this.game.updateLabels();
         this.game.stage.update();
     }
 

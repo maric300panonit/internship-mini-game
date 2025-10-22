@@ -18,12 +18,18 @@ export class Game{
 
     //character variables
     character!: Character;
+    
     //pausemenu variables
     pause_menu_container: createjs.Container = new createjs.Container();    
     pause_menu_shape: createjs.Shape = new createjs.Shape();
     pause_menu_text = new createjs.Text("Game Paused", "24px Arial", "#FFFFFF");
     pause_menu_width = 400;
     pause_menu_height = 200;
+
+    //labels variables
+    labelContainer: createjs.Container = new createjs.Container();
+    distanceTraveledLabel!: createjs.Text;
+    jumpCountLabel!: createjs.Text;
 
     constructor(canvasId: string) {
         this.stage = new createjs.Stage(canvasId);
@@ -37,6 +43,7 @@ export class Game{
     initialize() {
         this.setupBackgroundLayers();
         this.setupCharacter();
+        this.setupLabels();
         this.setupPauseMenu();
         this.setupTicker();
         this.setupEventListeners();
@@ -76,6 +83,23 @@ export class Game{
 
         this.character.bitmap.y = GROUND_LEVEL;
         this.stage.addChild(this.character.bitmap);
+    }
+
+    setupLabels() {
+        this.distanceTraveledLabel = new createjs.Text("distance traveled: " + this.character.distanceTraveled.toString(), "48px Arial");
+        this.distanceTraveledLabel.y = 10;
+        this.labelContainer.addChild(this.distanceTraveledLabel)
+
+        this.jumpCountLabel = new createjs.Text("jump count: " + this.character.jumpCount.toString(), "48px Arial");
+        this.jumpCountLabel.y = 65;
+        this.labelContainer.addChild(this.jumpCountLabel);
+
+        this.stage.addChild(this.labelContainer);
+    }
+
+    updateLabels() {
+        this.distanceTraveledLabel.text = "distance traveled: " + this.character.distanceTraveled;
+        this.jumpCountLabel.text = "jump count: " + this.character.jumpCount;
     }
 
     setupPauseMenu() {
