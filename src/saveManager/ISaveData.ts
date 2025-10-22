@@ -5,6 +5,11 @@ export interface ICharacterSaveData {
     distanceTraveled: number;
 }
 
+export interface IBackgroundLayerSaveData {
+    x: number;
+}
+
 export interface ISaveFile {
     characterSaveData: ICharacterSaveData;
+    backgroundLayers: IBackgroundLayerSaveData[];
 }
