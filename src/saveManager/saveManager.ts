@@ -4,12 +4,10 @@ export class SaveManager {
 
     public save(data: ISaveFile, filename: string = "savegame.xml"): void {
         try {
-            // Sada prosleđuješ ceo ISaveFile objekat
             const xmlString = this.createXmlString(data); 
             const blob = new Blob([xmlString], { type: "application/xml" });
             const url = URL.createObjectURL(blob);
 
-            // ... (ostatak save metode je isti)
             const a = document.createElement("a");
             a.href = url;
             a.download = filename;
@@ -24,7 +22,6 @@ export class SaveManager {
     }
 
     public load(): Promise<ISaveFile | null> {
-        // ... (load metoda ostaje potpuno ista)
         return new Promise((resolve, reject) => {
             const input = document.createElement("input");
             input.type = "file";
@@ -41,7 +38,6 @@ export class SaveManager {
                 reader.onload = (e) => {
                     try {
                         const xmlString = e.target?.result as string;
-                        // parseXmlString će sada vratiti ceo ISaveFile
                         const data = this.parseXmlString(xmlString); 
                         console.log("Game loaded!");
                         resolve(data);
@@ -65,17 +61,12 @@ export class SaveManager {
      */
     private createXmlString(data: ISaveFile): string {
         const charData = data.characterSaveData;
-        
-        // --- NOVO: Kreiranje XML-a za pozadine ---
-        // Mapiramo niz pozadina u niz stringova (XML tagova)
         const backgroundLayersXml = data.backgroundLayers.map(layer => 
             `        <BackgroundLayer>
             <x>${layer.x}</x>
         </BackgroundLayer>`
-        ).join("\n"); // Spajamo sve stringove u jedan, razdvojene novim redom
-        // --- KRAJ NOVOG DELA ---
+        ).join("\n");
 
-        // Ažurirani return sa uključenim backgroundLayersXml
         return `<?xml version="1.0" encoding="UTF-8"?>
                 <SaveFile>
                     <CharacterData>
@@ -107,7 +98,6 @@ export class SaveManager {
             return element ? element.textContent : null;
         };
         
-        // --- 1. Parsiranje CharacterData (isto kao pre) ---
         const charDataNode = xmlDoc.querySelector("CharacterData");
         if (!charDataNode) {
             throw new Error("Invalid save file: <CharacterData> not found.");
@@ -128,7 +118,6 @@ export class SaveManager {
             distanceTraveled: parseFloat(distanceTraveled)
         };
 
-        // --- 2. NOVO: Parsiranje BackgroundLayers ---
         const backgroundLayers: IBackgroundLayerSaveData[] = [];
         const layerNodes = xmlDoc.querySelectorAll("BackgroundLayers > BackgroundLayer");
 
@@ -138,12 +127,10 @@ export class SaveManager {
                 backgroundLayers.push({ x: parseFloat(layerX) });
             }
         });
-        // --- KRAJ NOVOG DELA ---
 
-        // Vraćamo kompletan ISaveFile objekat
         return {
             characterSaveData: characterSaveData,
-            backgroundLayers: backgroundLayers // Dodato
+            backgroundLayers: backgroundLayers
         };
     }
 }
